@@ -103,16 +103,15 @@ const lessons = [
     concept: "This is the basic arithmetic behind the congruences and modular powers in Chapter 2."
   },
   {
-    id: "totient", chapter: 0, title: "Count the coprime residues", topic: "ARITHMETIC FUNCTIONS", time: "6 MIN",
+    id: "totient", chapter: 0, title: "Count integers coprime to n", topic: "ARITHMETIC FUNCTIONS", time: "5 MIN",
     lede: "Euler's totient φ(n) counts the integers from 1 through n that are coprime to n.",
-    question: "How many residues <span class=\"math\">a</span> modulo <span class=\"math\">360</span> have <span class=\"math\">gcd(a, 360) = 1</span>?",
-    idea: "If n = ∏ pᵉ, then φ(n) = ∏ pᵉ⁻¹(p−1). Prime factorization turns the count into a product.",
-    starter: "# Factor 360, then count the residues coprime to it\nn = 360\n\n",
-    hint: "Compare a direct count with Sage's <code>euler_phi(n)</code>. What does the prime factorization tell you about the formula?",
-    answer: ["96"], placeholder: "φ(360) = ?",
-    success: "Right: φ(360) = 96. This lesson counts the residue classes represented by integers coprime to 360.",
-    proof: "For distinct primes p and q, count the numbers from 1 through pq that are not divisible by p or q. Use inclusion-exclusion to derive φ(pq)=(p−1)(q−1).",
-    concept: "The connection between coprime residues and modular inverses will be made explicitly in Chapter 2."
+    question: "Which integers from <span class=\"math\">1</span> through <span class=\"math\">12</span> are coprime to 12? How many are there? Enter that count, φ(12).",
+    idea: "Check gcd(a,12) for each integer a from 1 through 12. The ones with gcd 1 are 1, 5, 7, and 11, so the count is 4.",
+    starter: "# Count the integers from 1 through n that are coprime to n\nn = 12\neuler_phi(n)",
+    hint: "Use the definition to list the integers from 1 through 12 whose gcd with 12 is 1. Then compare your count with Sage's <code>euler_phi(12)</code>.",
+    answer: ["4"], placeholder: "φ(12) = ?",
+    success: "Correct: φ(12) = 4. The four integers are 1, 5, 7, and 11.",
+    concept: "For now, φ(n) is simply a count. Later we will use this count when studying modular inverses."
   },
 
   // Chapter 2 · Congruences
@@ -130,14 +129,14 @@ const lessons = [
   {
     id: "inverse", chapter: 1, title: "Undo multiplication modulo n", topic: "MODULAR INVERSES", time: "6 MIN",
     lede: "An inverse of a modulo n is a number u with au congruent to 1. It is the modular version of division.",
-    question: "Find the inverse of <span class=\"math\">17 modulo 3120</span>: find <span class=\"math\">u</span> with <span class=\"math\">17u ≡ 1 (mod 3120)</span>.",
-    idea: "An inverse exists exactly when gcd(a,n)=1. Bézout's identity supplies the coefficient u in au + nv = 1.",
-    starter: "# Find u such that 17*u differs from 1 by a multiple of 3120\na, n = 17, 3120\n\n# Check the gcd before looking for an inverse\n",
+    question: "The four integers counted by <span class=\"math\">φ(12)</span> are 1, 5, 7, and 11. Find the multiplicative inverse of 5 modulo 12: find <span class=\"math\">u</span> with <span class=\"math\">5u ≡ 1 (mod 12)</span>.",
+    idea: "The totient lesson counted integers coprime to 12. Now we find an inverse for one of them: 5 and 12 are coprime, so Bézout's identity guarantees an inverse.",
+    starter: "# Find u such that 5*u differs from 1 by a multiple of 12\na, n = 5, 12\n\n# Check the gcd before looking for an inverse\n",
     hint: "Try <code>inverse_mod(a, n)</code>, then verify <code>(a*u) % n</code> is 1.",
-    answer: ["2753"], placeholder: "inverse = ?",
-    success: "Exactly: 17 × 2753 = 46801 = 1 + 15 × 3120.",
+    answer: ["5"], placeholder: "inverse = ?",
+    success: "Exactly: 5 × 5 = 25 = 1 + 2 × 12, so 5 is its own inverse modulo 12.",
     proof: "Show both directions: if au ≡ 1 (mod n), then any common divisor of a and n divides 1; conversely, if gcd(a,n)=1, Bézout's identity gives an inverse modulo n.",
-    concept: "The inverse exists because 17 and 3120 are coprime. This is the key operation in RSA."
+    concept: "This small example connects the totient count to modular inverses. RSA will use the same operation with much larger numbers."
   },
   {
     id: "fermat", chapter: 1, title: "See Fermat's little theorem", topic: "FERMAT'S THEOREM", time: "6 MIN",
@@ -446,15 +445,10 @@ const lessonSupport = {
   },
   totient: {
     definitions: [
-      ["Coprime", "Two integers are coprime (or relatively prime) when their greatest common divisor is 1."],
-      ["Residue class modulo n", "All integers that have the same remainder after division by n. For instance, 1, 361, and -359 are in the same class modulo 360."],
-      ["Multiplicative inverse modulo n", "For a residue a, an inverse is a residue u such that a*u ≡ 1 (mod n). It exists exactly when gcd(a,n)=1."],
-      ["Euler's totient φ(n)", "The number of residue classes modulo n represented by integers coprime to n. Preview: these are exactly the classes with multiplicative inverses; Chapter 2 proves that connection."]
+      ["Euler's totient φ(n)", "The number of integers from 1 through n that are coprime to n. For example, φ(12)=4 because 1, 5, 7, and 11 are coprime to 12."]
     ],
     tools: [
-      ["euler_phi(n)", "Returns Euler's totient φ(n). For n = 360 it returns 96."],
-      ["factor(n)", "Returns the prime/exponent pairs in the factorization. The formula φ(n) = product over p^e dividing n of p^(e-1)*(p-1) uses these pairs."],
-      ["gcd(a, b)", "Returns the greatest common divisor of a and b. gcd(a, n) == 1 is the test that a is coprime to n."]
+      ["euler_phi(n)", "Sage's totient function. It returns the number of integers from 1 through n that are coprime to n; euler_phi(12) returns 4."]
     ]
   },
   remainders: {
