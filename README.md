@@ -1,10 +1,10 @@
 # Number Theory Fieldnotes
 
-A static, GitHub Pages course for computational number theory and Sagebrush. It has six chapters and 26 lessons, moving from divisibility and prime factorization through coprimality and introductory modular arithmetic before Euler's totient, then on to finite fields, RSA, quadratic fields, and class groups. Every lesson embeds its own editable Sage-mode Sagebrush notebook in the page, so learners can compute and check their result without leaving the course. A separate-tab link is available as a fallback. Lesson notebooks and course progress are saved in this browser.
+A static, GitHub Pages course for computational number theory and Sagebrush. It has six chapters and 27 lessons, introducing prime numbers before factorization, then coprimality and modular arithmetic before Euler's totient, followed by finite fields, RSA, quadratic fields, and class groups. Every lesson embeds its own editable Sage-mode Sagebrush notebook in the page, so learners can compute and check their result without leaving the course. A separate-tab link is available as a fallback. Lesson notebooks and course progress are saved in this browser.
 
 ## Curriculum
 
-1. Integer structure: divisibility, Bézout's identity, prime factorization, coprimality, modular arithmetic, and Euler's totient.
+1. Integer structure: divisibility, Bézout's identity, primes, prime factorization, coprimality, modular arithmetic, and Euler's totient.
 2. Congruences and cycles: residues, inverses, Fermat's little theorem, and the Chinese remainder theorem.
 3. Primes and algorithms: primality, prime search, prime counts, and integer factorization.
 4. Finite fields and groups: field arithmetic, quadratic residues, multiplicative order, and generators.

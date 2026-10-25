@@ -1,8 +1,8 @@
 const chapters = [
   {
     id: "integer-arithmetic", title: "Integer structure", short: "Integers",
-    overview: "Build the vocabulary of number theory: divisibility, gcds, prime factorization, coprimality, and arithmetic modulo n.",
-    goals: "By the end, use the Euclidean algorithm, factor integers, test whether numbers are coprime, calculate with remainders, and then use Euler's totient."
+    overview: "Start by comparing whole numbers, then build toward factoring and arithmetic with remainders.",
+    goals: "By the end, you can compare shared factors, recognize and break down building-block numbers, and calculate with remainders."
   },
   {
     id: "congruences", title: "Congruences & cycles", short: "Congruences",
@@ -56,6 +56,17 @@ const lessons = [
     concept: "The same algorithm that proves a gcd will later make division modulo n possible."
   },
   {
+    id: "prime-definition", chapter: 0, title: "Meet prime numbers", topic: "PRIME NUMBERS", time: "5 MIN",
+    lede: "Prime numbers are the basic factors from which every integer greater than 1 is built. First, learn what makes a number prime.",
+    question: "Is <span class=\"math\">29</span> prime? Run Sage's test and enter the output: True or False.",
+    idea: "A prime is an integer greater than 1 whose only positive divisors are 1 and itself. A composite integer greater than 1 has another divisor. The number 1 is neither prime nor composite.",
+    starter: "# Ask Sage whether 29 is prime\nn = 29\nis_prime(n)",
+    hint: "Run <code>is_prime(n)</code>. Sage displays True for a prime and False for a composite.",
+    answer: ["true"], placeholder: "True or False?",
+    success: "True. Since 29 is greater than 1 and has no positive divisors except 1 and 29, it is prime.",
+    concept: "Prime factorization makes sense once we know exactly what counts as a prime."
+  },
+  {
     id: "factor-small", chapter: 0, title: "Split an integer into primes", topic: "FUNDAMENTAL THEOREM OF ARITHMETIC", time: "5 MIN",
     lede: "Every integer greater than 1 has exactly one prime factorization, apart from the order of its factors.",
     question: "Find the prime factorization of <span class=\"math\">8051</span>. Which two primes multiply to make it?",
@@ -64,7 +75,7 @@ const lessons = [
     hint: "Try <code>factor(n)</code>. The answer is a product of prime powers; multiply the factors back together as a check.",
     answer: ["83*97", "83 97", "83,97", "97*83", "97 83", "97,83"], placeholder: "prime factors of 8051",
     success: "Exactly: 8051 = 83 × 97, with both factors prime.",
-    concept: "Prime factorization is the integer analogue of writing a polynomial as a product of irreducibles."
+    concept: "Prime factorization describes an integer as a product of primes and supplies the data for many arithmetic calculations."
   },
   {
     id: "coprime", chapter: 0, title: "Decide when two integers are coprime", topic: "COPRIMALITY", time: "5 MIN",
@@ -127,12 +138,12 @@ const lessons = [
     id: "fermat", chapter: 1, title: "See Fermat's little theorem", topic: "FERMAT'S THEOREM", time: "6 MIN",
     lede: "A prime modulus forces a striking pattern in powers: every nonzero residue raised to p−1 is 1 modulo p.",
     question: "Compute <span class=\"math\">3¹⁶ mod 17</span>. What value does Fermat's little theorem predict before you run the code?",
-    idea: "For prime p and p not dividing a, aᵖ⁻¹ ≡ 1 (mod p). This is a theorem about the multiplicative group of nonzero residues.",
+    idea: "For prime p and p not dividing a, aᵖ⁻¹ ≡ 1 (mod p). It describes a repeating pattern in powers of the nonzero remainders modulo p.",
     starter: "# Check the hypotheses, then compute the modular power\na, p = 3, 17\n\n",
     hint: "Use <code>is_prime(p)</code> and <code>power_mod(a, p-1, p)</code>.",
     answer: ["1"], placeholder: "3^16 modulo 17 = ?",
     success: "Yes: 1. The theorem applies because 17 is prime and 17 does not divide 3.",
-    concept: "The theorem follows from Lagrange's theorem applied to the nonzero residues modulo p."
+    concept: "The pattern comes from repeated multiplication among nonzero remainders; Chapter 4 develops more structure behind these cycles."
   },
   {
     id: "crt", chapter: 1, title: "Reconcile two repeating clocks", topic: "CHINESE REMAINDER THEOREM", time: "6 MIN",
@@ -197,7 +208,7 @@ const lessons = [
     id: "finite-field", chapter: 3, title: "Compute inside a finite field", topic: "FINITE FIELDS", time: "6 MIN",
     lede: "Integers modulo a prime p form a field: every nonzero element has a multiplicative inverse.",
     question: "In the field <span class=\"math\">𝔽₇</span>, compute <span class=\"math\">3⁶</span>. What is the result?",
-    idea: "The field has six nonzero elements. Lagrange's theorem implies every nonzero element raised to the group order, 6, is 1.",
+    idea: "The field has six nonzero elements. Lagrange's theorem says the order of each element divides the group's size, so raising it to the sixth power returns 1.",
     starter: "# Construct the field with seven elements\nF = GF(7)\na = F(3)\n\n# Compute a power and inspect the result\n",
     hint: "Evaluate <code>a^6</code>. Also try <code>F(3) * F(5)</code> and compare with ordinary integer multiplication.",
     answer: ["1"], placeholder: "3^6 in GF(7) = ?",
@@ -363,6 +374,18 @@ const lessonSupport = {
       ["== and *", "In Sage/Python, == compares two values and returns True or False; * multiplies. The expression a*u + b*v == g checks the certificate."]
     ]
   },
+  "prime-definition": {
+    definitions: [
+      ["Positive divisor", "A positive integer d is a divisor of n if n=d*k for some integer k. For example, the positive divisors of 29 are 1 and 29."],
+      ["Prime number", "An integer greater than 1 with exactly two positive divisors: 1 and itself."],
+      ["Composite number", "An integer greater than 1 that has a positive divisor other than 1 and itself. The number 1 is neither prime nor composite."]
+    ],
+    tools: [
+      ["is_prime(n)", "Sage's primality function. It returns True when n is prime and False otherwise, including for 0 and 1."],
+      ["Boolean value", "A value with one of two answers: True or False. Sage displays these words as the output for is_prime(n)."],
+      ["n = 29", "Assignment stores the integer 29 in the variable n. The final expression is_prime(n) is displayed as the cell output."]
+    ]
+  },
   "factor-small": {
     definitions: [
       ["Prime", "A positive integer greater than 1 whose only positive divisors are 1 and itself."],
@@ -405,6 +428,7 @@ const lessonSupport = {
     definitions: [
       ["Coprime", "Two integers are coprime (or relatively prime) when their greatest common divisor is 1."],
       ["Residue class modulo n", "All integers that have the same remainder after division by n. For instance, 1, 361, and -359 are in the same class modulo 360."],
+      ["Multiplicative inverse modulo n", "For a residue a, an inverse is a residue u such that a*u ≡ 1 (mod n). It exists exactly when gcd(a,n)=1."],
       ["Euler's totient φ(n)", "The number of residue classes modulo n that have a multiplicative inverse. Equivalently, it counts integers from 1 through n that are coprime to n."]
     ],
     tools: [
@@ -528,7 +552,9 @@ const lessonSupport = {
       ["Field", "A number system where addition, subtraction, multiplication, and division by any nonzero element are possible."],
       ["Finite field 𝔽ₚ", "A field with finitely many elements. For prime p, the integers modulo p form a field with p elements."],
       ["Group", "A set with an operation that stays in the set, is associative, has an identity, and gives every element an inverse."],
-      ["Multiplicative group of 𝔽ₚ", "The p-1 nonzero field elements with multiplication as the operation and 1 as the identity. They form a group because every nonzero field element has an inverse."]
+      ["Multiplicative group of 𝔽ₚ", "The p-1 nonzero field elements with multiplication as the operation and 1 as the identity. They form a group because every nonzero field element has an inverse."],
+      ["Order of an element", "The smallest positive exponent that makes the element equal the group's identity. For multiplication, the identity is 1."],
+      ["Lagrange's theorem", "In a finite group, the order of any element divides the number of elements in the group. Therefore, if the group has 6 elements, every element raised to the sixth power equals the identity."]
     ],
     tools: [
       ["GF(p)", "Creates the finite field with p elements; GF means Galois field. p must be a prime for this notation."],
@@ -581,8 +607,8 @@ const lessonSupport = {
   },
   "rsa-parameters": {
     definitions: [
-      ["RSA", "A public-key cryptosystem whose arithmetic is performed modulo a product n=pq of two primes. This lesson uses tiny example primes, not secure keys."],
       ["Public-key cryptosystem", "A system with a public operation anyone can use and a private key that lets its owner reverse that operation."],
+      ["RSA", "A public-key cryptosystem whose arithmetic is performed modulo a product n=pq of two primes. This lesson uses tiny example primes, not secure keys."],
       ["RSA modulus n", "The product p*q. It is public in RSA; the factors p and q are kept secret in a real key."],
       ["Totient φ(n)", "The number of invertible residues modulo n. For distinct primes p and q, φ(pq)=(p-1)(q-1)."]
     ],
@@ -636,9 +662,12 @@ const lessonSupport = {
   },
   "quadratic-field": {
     definitions: [
-      ["Number field", "A finite-degree extension of the rational numbers ℚ; its elements can be added, multiplied, and divided by nonzero elements."],
+      ["Algebraic number", "A complex number that is a root of a nonzero polynomial with rational coefficients. Square roots of integers are examples."],
+      ["Number field", "A number system containing the rational numbers and formed by adding algebraic numbers; its elements support addition, subtraction, multiplication, and division by nonzero elements."],
+      ["Square and nonsquare", "A square integer is t² for some integer t. A nonsquare is an integer that is not a square."],
+      ["Squarefree integer", "An integer not divisible by the square of any prime. The discriminant formula in the hint assumes d is squarefree."],
       ["Quadratic field ℚ(√d)", "The field obtained by adjoining a square root of a nonsquare integer d. It has dimension two over ℚ."],
-      ["Discriminant", "An integer invariant of a number field that encodes arithmetic information, including how primes can split or ramify."]
+      ["Discriminant", "An integer invariant of a number field that encodes arithmetic information and helps study how primes behave in the field."]
     ],
     tools: [
       ["QuadraticField(d)", "Constructs the quadratic field ℚ(√d). For d=-23, this represents ℚ(√-23)."],
@@ -648,13 +677,16 @@ const lessonSupport = {
   },
   "class-number": {
     definitions: [
-      ["Ring of integers", "The subring of a number field consisting of its algebraic integers; it is the natural setting for factorization in that field."],
-      ["Ideal", "A subset of a ring closed under addition and under multiplication by any ring element. Ideals let us recover unique factorization even when elements do not factor uniquely."],
-      ["Equivalent ideals", "Two nonzero ideals are equivalent when one is a nonzero field multiple of the other. This treats ideals that differ by a principal factor as the same class."],
-      ["Ideal class group", "A finite abelian group of equivalence classes of ideals; it measures which ideals fail to be generated by one element."],
-      ["Class number", "The number of elements in the ideal class group. A class number greater than 1 means the ring of integers does not have unique factorization of elements."],
       ["Algebraic integer", "A root of a monic polynomial with integer coefficients. A monic polynomial has leading coefficient 1."],
-      ["Unit", "An element of a ring that has a multiplicative inverse in that same ring."]
+      ["Ring", "A number system with addition and multiplication that obey the usual arithmetic laws; division by a nonzero element is not always possible."],
+      ["Ring of integers", "The collection of algebraic integers in a number field, with the inherited addition and multiplication; it is the natural setting for factorization in that field."],
+      ["Ideal", "A subset of a ring closed under addition, additive inverses, and multiplication by any ring element. Ideals help track factorization when elements do not factor uniquely."],
+      ["Equivalent ideals", "Two nonzero ideals are equivalent when one is obtained from the other by multiplying by a nonzero element of the number field."],
+      ["Ideal class group", "A finite abelian group (a finite group whose operation commutes) of equivalence classes of ideals; it measures which ideals fail to be generated by one element."],
+      ["Unit", "An element with a multiplicative inverse in the same ring."],
+      ["Irreducible element", "A nonzero nonunit that cannot be written as a product of two nonunits."],
+      ["Unique factorization of elements", "Every nonzero nonunit factors into irreducibles uniquely, apart from reordering and multiplying factors by units."],
+      ["Class number", "The number of elements in the ideal class group. In a ring of integers, class number 1 is equivalent to unique factorization of elements."]
     ],
     tools: [
       ["K.class_number()", "Computes and returns the class number of the field K."],
@@ -664,6 +696,8 @@ const lessonSupport = {
   },
   "compare-classes": {
     definitions: [
+      ["Unit", "An element with a multiplicative inverse in the same ring."],
+      ["Irreducible element", "A nonzero nonunit that cannot be written as a product of two nonunits."],
       ["Principal ideal", "An ideal generated by one ring element, written (a) for the ideal of multiples of a."],
       ["Unique factorization of elements", "The property that every nonzero nonunit element factors into irreducible elements in exactly one way, apart from order and units."],
       ["Class-number criterion", "For the ring of integers of a number field, class number 1 is equivalent to unique factorization of elements. If the class number is larger, it fails."]
@@ -820,10 +854,11 @@ function render() {
     <div class="module-meta"><span class="module-tag">${lesson.topic}</span><span>CH ${String(lesson.chapter + 1).padStart(2, "0")} · LESSON ${chapterLesson} / ${chapterLessons}</span><span>·</span><span>${lesson.time}</span></div>
     <div class="module-heading"><h2>${lesson.title}</h2><span class="solved-stamp ${solved ? "show" : ""}">✓ SOLVED</span></div>
     ${chapterIntro}
+    ${definitionBox}
     <p class="module-lede">${lesson.lede}</p>
     <div class="question-card"><span class="question-symbol">?</span><div><p class="question-label">YOUR PROBLEM</p><p>${lesson.question}</p></div></div>
     <p class="idea-row"><span class="bulb">✳</span><span><b>The idea.</b> ${lesson.idea}</span></p>
-    <div class="learning-resources">${definitionBox}${toolBox}${visual}</div>
+    <div class="learning-resources">${toolBox}${visual}</div>
     <section class="notebook-card" aria-labelledby="notebook-heading">
       <div class="notebook-heading"><div><p class="notebook-kicker">YOUR NUMBER THEORY LAB · SAGE MODE</p><h3 id="notebook-heading">Compute it here</h3></div><a class="notebook-popout" href="${notebookLink(lesson)}" target="_blank" rel="noopener noreferrer">Open in a separate tab <span aria-hidden="true">↗</span></a></div>
       <div class="notebook-host" id="sagebrush-notebook" aria-label="Sagebrush Sage notebook"><p class="notebook-loading" role="status">Starting Sagebrush…</p></div>
