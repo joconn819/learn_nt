@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f4f3ed">
-    <meta name="description" content="A hands-on field guide to computational number theory with Sagebrush in your browser.">
-    <title>Number Theory Fieldnotes — Learn with Sagebrush</title>
+    <meta name="description" content="A six-chapter, 24-lesson course in computational number theory using Sagebrush in your browser.">
+    <title>Number Theory Fieldnotes — A Course with Sagebrush</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
         <span class="brand-mark" aria-hidden="true">∑</span>
         <span>FIELDNOTES <span class="brand-light">/ NT</span></span>
       </a>
-      <div class="top-meta"><span class="live-dot"></span> A computational field guide <span class="meta-divider">·</span> <span id="top-progress">0 / 4 solved</span></div>
+      <div class="top-meta"><span class="live-dot"></span> A computational number theory course <span class="meta-divider">·</span> <span id="top-progress">0 / 24 solved</span></div>
       <a class="source-link" href="https://github.com/sagemathinc/sagebrush" target="_blank" rel="noreferrer">Sagebrush <span aria-hidden="true">↗</span></a>
     </header>
 
@@ -25,9 +25,9 @@
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
           <div class="eyebrow"><span>NUMBER THEORY</span><i>×</i><span>LIVE COMPUTATION</span></div>
-          <h1 id="hero-title">Think in primes.<br><em>Compute to see.</em></h1>
-          <p class="hero-intro">A small collection of number theory problems, worked by you in Sagebrush. Open a real Sage notebook in your browser, experiment, then bring your result back here.</p>
-          <div class="hero-note"><span class="note-star">✳</span><span><strong>No setup in the browser.</strong> Sagebrush runs Python and Sage syntax right in its own page.</span></div>
+          <h1 id="hero-title">From integers<br><em>to number fields.</em></h1>
+          <p class="hero-intro">A six-chapter course for curious mathematicians and programmers. Build number theory from the ground up by solving 24 problems in Sagebrush, one computation at a time.</p>
+          <div class="hero-note"><span class="note-star">✳</span><span><strong>Start with what you know.</strong> Each lesson introduces the idea, then asks you to explore it in code.</span></div>
         </div>
         <div class="hero-art" aria-hidden="true">
           <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div>
@@ -35,17 +35,17 @@
           <span class="orbit-label label-a">2 · 3 · 5 · 7</span><span class="orbit-label label-b">p ∣ n</span><span class="orbit-label label-c">gcd(a, n) = 1</span>
           <span class="orbit-node node-a">2</span><span class="orbit-node node-b">17</span><span class="orbit-node node-c">23</span>
         </div>
-        <div class="hero-index"><span>01 — 04</span><span>THE FIRST NOTEBOOKS</span></div>
+        <div class="hero-index"><span>06 CHAPTERS</span><span>24 HANDS-ON LESSONS</span></div>
       </section>
 
       <section class="workbench" aria-label="Number theory lessons">
         <aside class="lesson-nav">
-          <div class="nav-heading"><span>YOUR FIELD GUIDE</span><span class="nav-rule"></span></div>
+          <div class="nav-heading"><span>COURSE MAP · 6 CHAPTERS</span><span class="nav-rule"></span></div>
           <ol id="lesson-list" class="lesson-list"></ol>
           <div class="progress-card">
-            <div class="progress-head"><span>FIELD PROGRESS</span><strong id="progress-fraction">0 / 4</strong></div>
+            <div class="progress-head"><span>COURSE PROGRESS</span><strong id="progress-fraction">0 / 24</strong></div>
             <div class="progress-track"><span id="progress-bar"></span></div>
-            <p id="progress-caption">Start with the structure hidden inside an integer.</p>
+            <p id="progress-caption">Begin with divisibility and the structure of integers.</p>
           </div>
           <button class="reset-button" id="reset-progress" type="button">↺ <span>Reset progress</span></button>
         </aside>
@@ -54,14 +54,14 @@
 
         <aside class="side-notes">
           <div class="side-card syntax-card">
-            <div class="side-card-heading"><span class="tiny-icon">{ }</span><span>SAGEBRUSH BASICS</span></div>
-            <p>Use <b>Sage mode</b> in the notebook. It understands familiar Sage syntax and runs the computation in your browser.</p>
-            <div class="mini-code"><span class="code-muted">sage:</span> factor(8051)<br><span class="code-muted">out:</span> 83 · 97</div>
+          <div class="side-card-heading"><span class="tiny-icon">{ }</span><span>YOUR NUMBER THEORY LAB</span></div>
+          <p>Each problem opens an editable <b>Sage mode</b> notebook. Write code, run it, and use the output to build your answer.</p>
+            <div class="mini-code"><span class="code-muted">sage:</span> factor(n)<br><span class="code-muted">out:</span> prime powers</div>
             <a href="https://sagebrush.space/" target="_blank" rel="noreferrer">Meet the notebook <span>↗</span></a>
           </div>
           <div class="side-card method-card">
-            <div class="side-card-heading"><span class="tiny-icon amber">✳</span><span>HOW TO WORK</span></div>
-            <ol><li>Read the question and the idea.</li><li>Open the notebook and write Sage code.</li><li>Run it, inspect the output, and enter your result.</li></ol>
+          <div class="side-card-heading"><span class="tiny-icon amber">✳</span><span>HOW TO WORK</span></div>
+            <ol><li>Learn the concept and inspect the problem.</li><li>Write and run your own Sage code.</li><li>Use the output to justify your answer.</li></ol>
             <div class="method-foot"><span class="live-dot"></span> Progress saves on this device</div>
           </div>
           <div class="source-note">BUILT AROUND THE OPEN-SOURCE<br><a href="https://github.com/sagemathinc/sagebrush" target="_blank" rel="noreferrer">SAGEMATHINC / SAGEBRUSH ↗</a></div>
@@ -69,7 +69,7 @@
       </section>
     </main>
 
-    <footer><span>NUMBER THEORY FIELDNOTES</span><span>Make a conjecture. Run the code. Keep the evidence.</span><span>2026</span></footer>
+    <footer><span>NUMBER THEORY FIELDNOTES · 6 CHAPTERS</span><span>Make a conjecture. Run the code. Keep the evidence.</span><span>2026</span></footer>
     <script src="app.js" defer></script>
   </body>
 </html>
