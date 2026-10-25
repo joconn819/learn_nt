@@ -309,6 +309,353 @@ const lessons = [
   }
 ];
 
+// Each lesson after the introductory gcd lesson names its new mathematics
+// explicitly and documents the Sage/Python tools used in its notebook.
+const lessonSupport = {
+  gcd: {
+    definitions: [
+      ["Divides", "An integer d divides n if n = d*k for some integer k. We write d | n; for example, 18 | 252 because 252 = 18*14."],
+      ["Greatest common divisor gcd(a,b)", "The largest positive integer that divides both a and b. It is the greatest shared factor; gcd(252,198)=18."],
+      ["Remainder", "The value left after integer division. For example, 252 % 198 = 54. The Euclidean algorithm repeatedly replaces (a,b) by (b, a % b)."]
+    ],
+    tools: [
+      ["gcd(a, b)", "Sage's greatest-common-divisor function. It returns the largest positive integer dividing both inputs; for gcd(252,198), it returns 18."],
+      ["a % b", "The remainder operator. It returns the remainder after dividing a by b; the Euclidean algorithm uses this to make smaller inputs."],
+      ["a % g == 0", "A divisibility check: it returns True if the remainder is zero, meaning g divides a. In Sage, == compares values."]
+    ],
+    visual: {
+      title: "Euclidean algorithm: each remainder gets smaller",
+      caption: "The divisions end at remainder 0; the last nonzero remainder, 18, is the gcd.",
+      svg: `<svg viewBox="0 0 560 110" role="img" aria-label="Euclidean algorithm steps ending with gcd 18"><g font-family="monospace" font-size="11" fill="#435448"><rect x="8" y="20" width="118" height="58" rx="7" fill="#eef3eb" stroke="#d5e0d3"/><rect x="148" y="20" width="118" height="58" rx="7" fill="#eef3eb" stroke="#d5e0d3"/><rect x="288" y="20" width="118" height="58" rx="7" fill="#eef3eb" stroke="#d5e0d3"/><rect x="428" y="20" width="118" height="58" rx="7" fill="#e5f0e3" stroke="#b9d0bc"/><text x="67" y="43" text-anchor="middle">252 = 1·198</text><text x="67" y="62" text-anchor="middle">+ 54</text><text x="207" y="43" text-anchor="middle">198 = 3·54</text><text x="207" y="62" text-anchor="middle">+ 36</text><text x="347" y="43" text-anchor="middle">54 = 1·36</text><text x="347" y="62" text-anchor="middle">+ 18</text><text x="487" y="43" text-anchor="middle">36 = 2·18</text><text x="487" y="62" text-anchor="middle">+ 0</text></g><path d="M128 49h16m-5-5 5 5-5 5M268 49h16m-5-5 5 5-5 5M408 49h16m-5-5 5 5-5 5" fill="none" stroke="#829384" stroke-width="1.5"/><text x="280" y="101" text-anchor="middle" fill="#285b43" font-family="monospace" font-size="11">last nonzero remainder = gcd(252, 198) = 18</text></svg>`,
+      source: "a, b = 252, 198\nwhile b != 0:\n    a, b = b, a % b\nprint(a)  # 18"
+    }
+  },
+  bezout: {
+    definitions: [
+      ["Bézout's identity", "For integers a and b, there are integers u and v such that au + bv = gcd(a,b). This equation is a certificate: it proves that the gcd can be built from the original inputs."],
+      ["Bézout coefficients", "The integers u and v in that equation are called Bézout coefficients. They can be negative; their job is to make the equality exact."],
+      ["Extended Euclidean algorithm", "A version of the Euclidean algorithm that finds both the gcd and Bézout coefficients." ]
+    ],
+    tools: [
+      ["xgcd(a, b)", "Sage's extended gcd function. It returns a triple (g, u, v) with g = gcd(a,b) and a*u + b*v == g. Here xgcd(252,198) returns (18, 4, -5)."],
+      ["== and *", "In Sage/Python, == compares two values and returns True or False; * multiplies. The expression a*u + b*v == g checks the certificate."]
+    ]
+  },
+  "factor-small": {
+    definitions: [
+      ["Prime", "A positive integer greater than 1 whose only positive divisors are 1 and itself."],
+      ["Prime factorization", "Writing an integer as a product of primes, with each prime appearing the number of times indicated by its exponent. For example, 12 = 2^2 * 3."],
+      ["Exponent", "In p^e, the exponent e says how many copies of p occur in the product."],
+      ["Fundamental Theorem of Arithmetic", "Every integer greater than 1 has a prime factorization, and that factorization is unique apart from reordering the factors."]
+    ],
+    tools: [
+      ["factor(n)", "Returns Sage's prime factorization of n as prime/exponent pairs. For example, factor(12) displays 2^2 * 3; the factors are certified prime for these inputs."],
+      ["prod(p^e for p,e in factor(n))", "A Sage/Python product expression that multiplies each prime p to its exponent e. It reconstructs n, so it is a useful check. Sage uses ^ for exponentiation; in ordinary Python use ** instead."]
+    ]
+  },
+  totient: {
+    definitions: [
+      ["Coprime", "Two integers are coprime (or relatively prime) when their greatest common divisor is 1."],
+      ["Residue class modulo n", "All integers that have the same remainder after division by n. For instance, 1, 361, and -359 are in the same class modulo 360."],
+      ["Euler's totient φ(n)", "The number of residue classes modulo n that have a multiplicative inverse. Equivalently, it counts integers from 1 through n that are coprime to n."]
+    ],
+    tools: [
+      ["euler_phi(n)", "Returns Euler's totient φ(n). For n = 360 it returns 96."],
+      ["factor(n)", "Returns the prime/exponent pairs in the factorization. The formula φ(n) = product over p^e dividing n of p^(e-1)*(p-1) uses these pairs."],
+      ["gcd(a, b)", "Returns the greatest common divisor of a and b. gcd(a, n) == 1 is the test that a is coprime to n."]
+    ]
+  },
+  remainders: {
+    definitions: [
+      ["Congruence", "The notation a ≡ b (mod m) means m divides a-b; equivalently, a and b leave the same remainder on division by m."],
+      ["Modulus", "The positive integer m that sets which differences count as equal in a congruence."],
+      ["Residue", "A chosen representative, usually from 0 through m-1, of a congruence class."],
+      ["Modular exponentiation", "Computing a^e modulo m while reducing intermediate values, so the calculation stays small even when a^e is enormous."]
+    ],
+    tools: [
+      ["power_mod(a, e, m)", "Returns a^e modulo m without constructing the full power. Arguments are base, exponent, modulus, in that order."],
+      ["a % m", "The % operator returns the remainder after integer division. Thus 37^100 % 101 is the remainder, though power_mod is more efficient for large exponents."],
+      ["^", "In Sage code, ^ means exponentiation. In plain Python, use **. The Sagebrush notebook is in Sage mode."]
+    ],
+    visual: {
+      title: "A modular power stays among 101 residues",
+      caption: "All powers reduce to one of 0–100. The highlighted final result is 1.",
+      svg: `<svg viewBox="0 0 560 88" role="img" aria-label="Remainder scale from 0 to 100 with remainder 1 highlighted"><line x1="28" y1="45" x2="532" y2="45" stroke="#9aa99b" stroke-width="2"/><g fill="#879487" font-family="monospace" font-size="10"><text x="24" y="70">0</text><text x="273" y="70">50</text><text x="514" y="70">100</text></g><circle cx="33" cy="45" r="7" fill="#285b43"/><path d="M33 33v-10h80" fill="none" stroke="#285b43"/><text x="118" y="26" fill="#285b43" font-family="monospace" font-size="11">37^100 mod 101 = 1</text></svg>`,
+      source: "a, e, m = 37, 100, 101\nr = power_mod(a, e, m)\nprint(r)  # 1"
+    }
+  },
+  inverse: {
+    definitions: [
+      ["Multiplicative inverse modulo n", "An integer u is the inverse of a modulo n when a*u ≡ 1 (mod n). It plays the role of division in modular arithmetic."],
+      ["Existence condition", "An inverse exists exactly when gcd(a,n)=1. Bézout's identity proves this: if au + nv = 1, then au is 1 modulo n."],
+      ["Uniqueness modulo n", "When an inverse exists, all answers differ by a multiple of n, so they represent one residue class."]
+    ],
+    tools: [
+      ["inverse_mod(a, n)", "Returns u with a*u ≡ 1 (mod n), when gcd(a,n)=1. It raises an error if no inverse exists."],
+      ["gcd(a, n)", "Returns the greatest common divisor. Check that this is 1 before asking for an inverse."],
+      ["(a*u) % n", "Multiplies a by the proposed inverse and returns the remainder; the check should equal 1."]
+    ]
+  },
+  fermat: {
+    definitions: [
+      ["Fermat's little theorem", "If p is prime and p does not divide a, then a^(p-1) ≡ 1 (mod p). The prime and nonzero conditions are part of the theorem."],
+      ["Hypotheses", "The statements that must be true before a theorem can be applied. Here we must check that p is prime and a is not divisible by p."],
+      ["Nonzero residue", "A residue modulo p other than 0. For prime p, every nonzero residue has a multiplicative inverse."]
+    ],
+    tools: [
+      ["is_prime(p)", "Returns True if Sage certifies p is prime, and False if it is composite."],
+      ["power_mod(a, e, m)", "Returns a^e modulo m; use e = p-1 and m = p to check the theorem."],
+      ["a % p", "Returns the remainder of a on division by p. A nonzero result verifies p does not divide a."]
+    ]
+  },
+  crt: {
+    definitions: [
+      ["Chinese remainder theorem (CRT)", "For coprime positive moduli m and n, any pair of remainders a modulo m and b modulo n comes from exactly one residue class modulo m*n."],
+      ["Coprime moduli", "Moduli whose gcd is 1. This condition makes the combined solution unique modulo their product."],
+      ["Least positive representative", "The smallest integer greater than 0 in a residue class. It is convenient for reporting a CRT answer but is not the only solution as an integer."]
+    ],
+    tools: [
+      ["crt(a, b, m, n)", "Returns x satisfying x ≡ a (mod m) and x ≡ b (mod n). The order is first remainder, second remainder, first modulus, second modulus."],
+      ["x % m", "Returns the remainder of x modulo m; use this to verify each congruence."],
+      ["gcd(m, n)", "Checks the CRT hypothesis: the two moduli in this exercise have gcd 1."]
+    ],
+    visual: {
+      title: "Two repeating schedules meet at 11",
+      caption: "Dots mark numbers congruent to 2 mod 9; squares mark numbers congruent to 3 mod 8. Their first shared positive time is 11.",
+      svg: `<svg viewBox="0 0 560 112" role="img" aria-label="Number line showing the first intersection of residues modulo 9 and 8 at 11"><text x="8" y="32" fill="#69736b" font-family="monospace" font-size="11">x ≡ 2 (mod 9)</text><text x="8" y="77" fill="#69736b" font-family="monospace" font-size="11">x ≡ 3 (mod 8)</text><line x1="155" y1="28" x2="535" y2="28" stroke="#dfe2d9"/><line x1="155" y1="73" x2="535" y2="73" stroke="#dfe2d9"/><g fill="#6d9674"><circle cx="207" cy="28" r="5"/><circle cx="254" cy="28" r="5"/><circle cx="302" cy="28" r="5"/><circle cx="349" cy="28" r="5"/><circle cx="397" cy="28" r="5"/><circle cx="444" cy="28" r="5"/><circle cx="492" cy="28" r="5"/></g><g fill="#bf8652"><rect x="207" y="68" width="10" height="10"/><rect x="249" y="68" width="10" height="10"/><rect x="291" y="68" width="10" height="10"/><rect x="333" y="68" width="10" height="10"/><rect x="375" y="68" width="10" height="10"/><rect x="417" y="68" width="10" height="10"/><rect x="459" y="68" width="10" height="10"/></g><g fill="#7c867d" font-family="monospace" font-size="9"><text x="154" y="101">1</text><text x="201" y="101">10</text><text x="248" y="101">19</text><text x="294" y="101">28</text><text x="341" y="101">37</text><text x="389" y="101">46</text><text x="435" y="101">55</text><text x="483" y="101">64</text></g><circle cx="212" cy="28" r="9" fill="none" stroke="#285b43" stroke-width="2"/><rect x="205" y="66" width="14" height="14" fill="none" stroke="#285b43" stroke-width="2"/><path d="M212 40v19" stroke="#285b43" stroke-dasharray="3 3"/><text x="221" y="52" fill="#285b43" font-family="monospace" font-size="10">x = 11</text></svg>`,
+      source: "shared = [x for x in range(1, 73) if x % 9 == 2 and x % 8 == 3]\nprint(shared)  # [11]"
+    }
+  },
+  primality: {
+    definitions: [
+      ["Prime and composite", "A prime integer greater than 1 has exactly two positive divisors. A composite integer greater than 1 has a divisor other than 1 and itself."],
+      ["Primality test", "An algorithm that decides whether an integer is prime. A computational test can be exact or probabilistic; Sage's is_prime uses its configured proof setting."],
+      ["Trial division", "Testing possible prime divisors one by one. If a composite n has a factor, at least one factor is no larger than sqrt(n), so larger candidates need not be checked."],
+      ["Divisor bound", "If n = a*b with both factors greater than 1, at least one of a,b is at most sqrt(n). This makes trial division finite."]
+    ],
+    tools: [
+      ["is_prime(n)", "Returns a Boolean value: True for prime and False for composite. Boolean values are displayed as True/False in Sage."],
+      ["sqrt(n)", "Returns the square root; floor(sqrt(n)) is a sufficient upper bound for trial divisors."],
+      ["range(2, B+1)", "Python's range creates the integers 2 through B when B is an integer. Combine with n % d == 0 to test divisibility."]
+    ]
+  },
+  "prime-search": {
+    definitions: [
+      ["Prime gap", "The difference between consecutive primes. Near a large number x, typical gaps grow slowly, roughly on the scale of log(x), but individual gaps vary."],
+      ["Prime Number Theorem", "A theorem stating that the proportion of integers near x that are prime is approximately 1/log(x) for large x."],
+      ["Next prime", "The smallest prime strictly greater than a given integer."]
+    ],
+    tools: [
+      ["next_prime(n)", "Returns the smallest prime strictly larger than n. It does not test n itself."],
+      ["is_prime(n)", "Returns True for a prime and False for a composite; use it to check a candidate."],
+      ["n-1", "Ordinary integer subtraction. Checking the previous integer is not enough in general; to prove a prime is the next one, all intervening integers must be composite."]
+    ]
+  },
+  "prime-count": {
+    definitions: [
+      ["Prime-counting function π(x)", "The number of prime integers less than or equal to x. In this exercise, the requested count is for primes strictly less than 100; 100 is not prime, so the count is also π(100)."],
+      ["List", "An ordered collection of values. A prime list lets us count or inspect the individual primes."],
+      ["Half-open interval [a,b)", "The values starting at a and ending just before b. Sage's prime_range(2,100) uses this convention."]
+    ],
+    tools: [
+      ["prime_range(a, b)", "Returns the list of primes p with a ≤ p < b. With one argument b, it returns primes p with 2 ≤ p < b."],
+      ["len(L)", "Python's built-in len function returns the number of entries in a list or other collection."],
+      ["prime_range(100)", "The exact call for this problem: it gives the primes below 100, and len(prime_range(100)) is 25."]
+    ]
+  },
+  "large-factor": {
+    definitions: [
+      ["Composite", "An integer greater than 1 that is not prime; it can be written as a product of smaller positive integers."],
+      ["Largest prime factor", "The greatest prime appearing in an integer's prime factorization."],
+      ["Factoring asymmetry", "For appropriately chosen large integers, multiplying known primes is quick while recovering those primes from their product appears much harder with known classical algorithms. This is a practical observation, not a proof of security."]
+    ],
+    tools: [
+      ["factor(n)", "Returns the prime factorization as prime/exponent pairs. For this input it displays 71 * 839 * 1471 * 6857."],
+      ["max(factor(n))", "Sage factor entries are pairs, so do not apply max to the raw factorization. Use max(p for p,e in factor(n)) to get the largest prime; max is Python's largest-value function."],
+      ["prod(p^e for p,e in factor(n))", "Multiplies the prime powers back together to verify the factorization. In plain Python, replace ^ with **."]
+    ]
+  },
+  "finite-field": {
+    definitions: [
+      ["Field", "A number system where addition, subtraction, multiplication, and division by any nonzero element are possible."],
+      ["Finite field 𝔽ₚ", "A field with finitely many elements. For prime p, the integers modulo p form a field with p elements."],
+      ["Group", "A set with an operation that stays in the set, is associative, has an identity, and gives every element an inverse."],
+      ["Multiplicative group of 𝔽ₚ", "The p-1 nonzero field elements with multiplication as the operation and 1 as the identity. They form a group because every nonzero field element has an inverse."]
+    ],
+    tools: [
+      ["GF(p)", "Creates the finite field with p elements; GF means Galois field. p must be a prime for this notation."],
+      ["F(a)", "Converts the integer a into an element of the field F, reducing it modulo p."],
+      ["a^e", "Raises a Sage value to exponent e. In 𝔽₇ the result is reduced within the field; in plain Python use ** for powers."]
+    ]
+  },
+  "quadratic-residues": {
+    definitions: [
+      ["Quadratic residue modulo p", "A residue a is a quadratic residue if a ≡ x² (mod p) for some integer x. If no such x exists, it is a quadratic nonresidue."],
+      ["Legendre symbol (a/p)", "For odd prime p, it is 0 if p divides a, +1 if a is a nonzero square modulo p, and -1 if it is not a square."],
+      ["Euler's criterion", "For odd prime p not dividing a, a^((p-1)/2) is congruent to 1 for a square and -1 modulo p for a nonsquare."]
+    ],
+    tools: [
+      ["legendre_symbol(a, p)", "Returns 1, 0, or -1 with the meanings defined above. Inputs should use an odd prime p."],
+      ["power_mod(a, e, p)", "Computes a^e modulo p; set e=(p-1)//2 to check Euler's criterion. // is integer division in Sage/Python."],
+      ["GF(p)", "Creates the finite field modulo prime p; you can list x^2 for x in GF(p) to see the square residues directly."]
+    ]
+  },
+  "multiplicative-order": {
+    definitions: [
+      ["Multiplicative order", "The smallest positive integer k for which a^k ≡ 1 (mod n), provided a has an inverse modulo n."],
+      ["Modular integer Mod(a,n)", "A Sage object representing the residue class of a modulo n. Arithmetic on it is reduced modulo n."],
+      ["Group order", "The number of elements in a group. For prime p, the nonzero residues modulo p form a group with p-1 elements."]
+    ],
+    tools: [
+      ["Mod(a, n)", "Constructs the residue class of a modulo n. For example, Mod(2,13) is the class of 2 modulo 13."],
+      ["a.multiplicative_order()", "A method on a modular value that returns its multiplicative order. Parentheses call the method; it fails if a is not invertible."],
+      ["a^k % n", "Computes a power and its remainder, which you can use to list the cycle by hand. Sage uses ^ for exponentiation."]
+    ],
+    visual: {
+      title: "Powers of 2 cycle through every nonzero residue mod 13",
+      caption: "The sequence returns to 1 after 12 powers, so the multiplicative order is 12.",
+      svg: `<svg viewBox="0 0 560 118" role="img" aria-label="Twelve residues generated by powers of 2 modulo 13"><path d="M35 60H525" stroke="#dfe2d9" stroke-width="2"/><g fill="#e8eee5" stroke="#b8cbb8"><circle cx="45" cy="60" r="17"/><circle cx="87" cy="60" r="17"/><circle cx="129" cy="60" r="17"/><circle cx="171" cy="60" r="17"/><circle cx="213" cy="60" r="17"/><circle cx="255" cy="60" r="17"/><circle cx="297" cy="60" r="17"/><circle cx="339" cy="60" r="17"/><circle cx="381" cy="60" r="17"/><circle cx="423" cy="60" r="17"/><circle cx="465" cy="60" r="17"/><circle cx="507" cy="60" r="17"/></g><circle cx="45" cy="60" r="17" fill="#285b43" stroke="#285b43"/><g fill="#33493a" font-family="monospace" font-size="11" text-anchor="middle"><text x="45" y="64" fill="white">1</text><text x="87" y="64">2</text><text x="129" y="64">4</text><text x="171" y="64">8</text><text x="213" y="64">3</text><text x="255" y="64">6</text><text x="297" y="64">12</text><text x="339" y="64">11</text><text x="381" y="64">9</text><text x="423" y="64">5</text><text x="465" y="64">10</text><text x="507" y="64">7</text></g><text x="45" y="25" fill="#718074" font-family="monospace" font-size="9" text-anchor="middle">k=0</text><text x="507" y="25" fill="#718074" font-family="monospace" font-size="9" text-anchor="middle">k=11</text><path d="M507 84 C470 112 82 112 45 84" fill="none" stroke="#285b43" stroke-dasharray="4 4"/><text x="275" y="112" fill="#285b43" font-family="monospace" font-size="10" text-anchor="middle">next power: 2^12 ≡ 1 (mod 13)</text></svg>`,
+      source: "a, p = 2, 13\nvalues = [power_mod(a, k, p) for k in range(p - 1)]\nprint(values)  # [1, 2, 4, 8, 3, 6, 12, 11, 9, 5, 10, 7]"
+    }
+  },
+  "primitive-root": {
+    definitions: [
+      ["Cyclic group", "A group whose elements are all powers of one element."],
+      ["Generator", "An element whose powers produce every element of a group."],
+      ["Primitive root modulo p", "A generator of the multiplicative group of nonzero residues modulo prime p. Its order is p-1."],
+      ["Order of an element", "The smallest positive exponent k for which the element raised to k is the identity; for multiplication, the identity is 1."]
+    ],
+    tools: [
+      ["primitive_root(p)", "Returns a primitive root modulo prime p. Sage's returned root is not necessarily the smallest one, so this lesson searches candidates in increasing order."],
+      ["Mod(a, p).multiplicative_order()", "Creates the residue class and returns the length of its power cycle. A candidate is a primitive root exactly when this equals p-1."],
+      ["power_mod(a, k, p)", "Computes the k-th power modulo p, useful for checking a proposed generator's cycle."]
+    ]
+  },
+  "rsa-parameters": {
+    definitions: [
+      ["RSA", "A public-key cryptosystem whose arithmetic is performed modulo a product n=pq of two primes. This lesson uses tiny example primes, not secure keys."],
+      ["Public-key cryptosystem", "A system with a public operation anyone can use and a private key that lets its owner reverse that operation."],
+      ["RSA modulus n", "The product p*q. It is public in RSA; the factors p and q are kept secret in a real key."],
+      ["Totient φ(n)", "The number of invertible residues modulo n. For distinct primes p and q, φ(pq)=(p-1)(q-1)."]
+    ],
+    tools: [
+      ["euler_phi(n)", "Returns the number of invertible residue classes modulo n."],
+      ["p * q", "Ordinary multiplication. The comma assignment p, q = 61, 53 assigns the two values at once."],
+      ["(p-1)*(q-1)", "The shortcut formula for φ(pq) when p and q are distinct primes."]
+    ]
+  },
+  "rsa-private": {
+    definitions: [
+      ["Public exponent e", "The exponent used for encryption; it is public and must be coprime to φ(n)."],
+      ["Private exponent d", "The exponent used for decryption. It is chosen so ed ≡ 1 (mod φ(n))."],
+      ["Modular inverse", "A value d satisfying e*d ≡ 1 modulo φ(n); it exists because gcd(e,φ(n))=1."]
+    ],
+    tools: [
+      ["inverse_mod(e, phi_n)", "Returns d such that e*d has remainder 1 modulo phi_n. It requires e and phi_n to be coprime."],
+      ["(e*d) % phi_n", "Checks the defining inverse condition; the result should be 1."],
+      ["%", "The remainder operator. In a congruence check, (e*d) % phi_n == 1 means e*d ≡ 1 (mod phi_n)."]
+    ]
+  },
+  "rsa-encrypt": {
+    definitions: [
+      ["Message m", "The integer being represented in RSA; it must satisfy 0 ≤ m < n."],
+      ["Encryption", "The public computation c ≡ m^e (mod n), where c is the ciphertext."],
+      ["Ciphertext c", "The residue produced by encryption. It hides the message only when real RSA is used with suitable large keys and secure encoding."]
+    ],
+    tools: [
+      ["power_mod(m, e, n)", "Computes m^e modulo n efficiently and returns the ciphertext representative."],
+      ["m, e, n = ...", "Python/Sage multiple assignment: each variable receives the corresponding value on the right."],
+      ["^", "Exponentiation in Sage mode. In plain Python, write m ** e; power_mod avoids constructing the large power either way."]
+    ],
+    visual: {
+      title: "Toy RSA round trip",
+      caption: "With n=3233, the public exponent maps 65 to 2790; the private exponent maps it back.",
+      svg: `<svg viewBox="0 0 560 112" role="img" aria-label="RSA encryption and decryption diagram from message 65 to ciphertext 2790 and back"><rect x="12" y="27" width="116" height="54" rx="8" fill="#eef3eb" stroke="#d5e0d3"/><rect x="220" y="27" width="116" height="54" rx="8" fill="#f4eadf" stroke="#ead9c6"/><rect x="432" y="27" width="116" height="54" rx="8" fill="#eef3eb" stroke="#d5e0d3"/><text x="70" y="49" fill="#718074" font-family="monospace" font-size="9" text-anchor="middle">MESSAGE</text><text x="70" y="68" fill="#285b43" font-family="monospace" font-size="16" text-anchor="middle">65</text><text x="278" y="49" fill="#9b714d" font-family="monospace" font-size="9" text-anchor="middle">CIPHERTEXT</text><text x="278" y="68" fill="#805c3d" font-family="monospace" font-size="16" text-anchor="middle">2790</text><text x="490" y="49" fill="#718074" font-family="monospace" font-size="9" text-anchor="middle">RECOVERED</text><text x="490" y="68" fill="#285b43" font-family="monospace" font-size="16" text-anchor="middle">65</text><path d="M135 54h72m-8-6 8 6-8 6M345 54h72m-8-6 8 6-8 6" fill="none" stroke="#718074" stroke-width="2"/><text x="171" y="27" fill="#718074" font-family="monospace" font-size="9" text-anchor="middle">m^17 mod 3233</text><text x="381" y="27" fill="#718074" font-family="monospace" font-size="9" text-anchor="middle">c^2753 mod 3233</text></svg>`,
+      source: "n, e, d, m = 3233, 17, 2753, 65\nc = power_mod(m, e, n)\nrecovered = power_mod(c, d, n)\nprint(c, recovered)  # 2790 65"
+    }
+  },
+  "rsa-decrypt": {
+    definitions: [
+      ["Decryption", "Computing m ≡ c^d (mod n) with the private exponent d to recover the message."],
+      ["Euler's theorem", "If gcd(a,n)=1, then a^φ(n) ≡ 1 (mod n). It explains the RSA round trip when the message is coprime to n."],
+      ["Exponent relation", "Since d is the inverse of e modulo φ(n), there is an integer k with ed = 1 + kφ(n). This makes (m^e)^d = m^(1+kφ(n))."]
+    ],
+    tools: [
+      ["power_mod(c, d, n)", "Computes c^d modulo n and returns the decrypted representative."],
+      ["gcd(m, n)", "Checks the coprimality condition used in Euler's theorem. For this toy message it equals 1."],
+      ["e*d == 1 (mod φ(n))", "In code, test this as (e*d) % euler_phi(n) == 1. It verifies that d is the inverse exponent."]
+    ]
+  },
+  "quadratic-field": {
+    definitions: [
+      ["Number field", "A finite-degree extension of the rational numbers ℚ; its elements can be added, multiplied, and divided by nonzero elements."],
+      ["Quadratic field ℚ(√d)", "The field obtained by adjoining a square root of a nonsquare integer d. It has dimension two over ℚ."],
+      ["Discriminant", "An integer invariant of a number field that encodes arithmetic information, including how primes can split or ramify."]
+    ],
+    tools: [
+      ["QuadraticField(d)", "Constructs the quadratic field ℚ(√d). For d=-23, this represents ℚ(√-23)."],
+      ["K.discriminant()", "Calls the discriminant method on the field K and returns its integer discriminant."],
+      ["% 4", "Computes a remainder modulo 4. For squarefree d, the quadratic field discriminant is d if d ≡ 1 (mod 4), and 4d otherwise."]
+    ]
+  },
+  "class-number": {
+    definitions: [
+      ["Ring of integers", "The subring of a number field consisting of its algebraic integers; it is the natural setting for factorization in that field."],
+      ["Ideal", "A subset of a ring closed under addition and under multiplication by any ring element. Ideals let us recover unique factorization even when elements do not factor uniquely."],
+      ["Equivalent ideals", "Two nonzero ideals are equivalent when one is a nonzero field multiple of the other. This treats ideals that differ by a principal factor as the same class."],
+      ["Ideal class group", "A finite abelian group of equivalence classes of ideals; it measures which ideals fail to be generated by one element."],
+      ["Class number", "The number of elements in the ideal class group. A class number greater than 1 means the ring of integers does not have unique factorization of elements."],
+      ["Algebraic integer", "A root of a monic polynomial with integer coefficients. A monic polynomial has leading coefficient 1."],
+      ["Unit", "An element of a ring that has a multiplicative inverse in that same ring."]
+    ],
+    tools: [
+      ["K.class_number()", "Computes and returns the class number of the field K."],
+      ["K.class_group()", "Computes the ideal class group object. Its size is the class number; Sage can display its group structure."],
+      ["QuadraticField(-23)", "Constructs the example field used in this lesson. K is simply a variable name holding that field."]
+    ]
+  },
+  "compare-classes": {
+    definitions: [
+      ["Principal ideal", "An ideal generated by one ring element, written (a) for the ideal of multiples of a."],
+      ["Unique factorization of elements", "The property that every nonzero nonunit element factors into irreducible elements in exactly one way, apart from order and units."],
+      ["Class-number criterion", "For the ring of integers of a number field, class number 1 is equivalent to unique factorization of elements. If the class number is larger, it fails."]
+    ],
+    tools: [
+      ["K.class_number()", "Returns the class number of K. Here it is 2 for ℚ(√-5) and 3 for ℚ(√-23)."],
+      ["QuadraticField(d)", "Constructs ℚ(√d); assigning two such fields to K and L lets you compare their values."],
+      ["== 1", "A comparison that returns True exactly when the class number is 1; that is the unique-factorization criterion in this setting."]
+    ]
+  },
+  "prime-splitting": {
+    definitions: [
+      ["Prime ideal", "A proper ideal P for which a*b in P implies a in P or b in P. Prime ideals play the role of prime numbers in a number ring."],
+      ["Ring of integers O_K", "The algebraic integers in the field K. The notation (2)O_K means the ideal generated by 2 in that ring."],
+      ["Prime above p", "A prime ideal in a number field whose intersection with the ordinary integers is generated by the rational prime p."],
+      ["Splitting, inertness, and ramification", "A rational prime splits when its ideal factors into two distinct prime ideals. It is inert if the ideal remains prime, and ramified if a prime ideal factor repeats."]
+    ],
+    tools: [
+      ["K.primes_above(p)", "Returns the list of prime ideals of K lying above the rational prime p."],
+      ["len(L)", "Returns the number of entries in a list L. Thus len(K.primes_above(2)) counts the prime ideals above 2."],
+      ["QuadraticField(d)", "Builds the field K in which Sage will factor the ideal generated by p."]
+    ]
+  }
+};
+
+// The visual panels are drawn as inline SVG, so the site needs no image host.
+// Their underlying values are regenerated by the Sage/Python snippets shown.
+lessonSupport.primality.visual = {
+  title: "Prime numbers in a small window",
+  caption: "Green cells are prime; muted cells are composite. One is neither, because it has only one positive divisor.",
+  svg: `<svg viewBox="0 0 560 138" role="img" aria-label="Numbers 1 through 30 with primes highlighted"><g font-family="monospace" font-size="10" text-anchor="middle">${Array.from({length:30},(_,i)=>{const n=i+1,x=8+(i%5)*110,y=8+Math.floor(i/5)*21,prime=[2,3,5,7,11,13,17,19,23,29].includes(n),fill=prime?"#e3ede1":n===1?"#f4eadf":"#f0f1eb",color=prime?"#285b43":n===1?"#8b755e":"#788378";return `<rect x="${x}" y="${y}" width="100" height="17" rx="4" fill="${fill}"/><text x="${x+50}" y="${y+12}" fill="${color}">${n}${prime?" · prime":n===1?" · neither":""}</text>`}).join("")}</g></svg>`,
+  source: "small_primes = [n for n in range(2, 31) if is_prime(n)]\nprint(small_primes)  # [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]"
+};
+lessonSupport["prime-splitting"].visual = {
+  title: "The prime 2 splits into two prime ideals",
+  caption: "In the ring of integers of ℚ(√−23), the ideal generated by 2 factors into two distinct prime ideals.",
+  svg: `<svg viewBox="0 0 560 128" role="img" aria-label="The ideal generated by 2 factors into two distinct prime ideals"><rect x="206" y="8" width="148" height="40" rx="7" fill="#eef3eb" stroke="#d5e0d3"/><text x="280" y="33" text-anchor="middle" fill="#285b43" font-family="serif" font-size="19">(2)O_K</text><path d="M280 48v23M280 71H150v14M280 71h130v14" fill="none" stroke="#829384" stroke-width="2"/><rect x="73" y="86" width="154" height="35" rx="7" fill="#e3ede1" stroke="#b9d0bc"/><rect x="333" y="86" width="154" height="35" rx="7" fill="#e3ede1" stroke="#b9d0bc"/><text x="150" y="109" text-anchor="middle" fill="#285b43" font-family="serif" font-size="16">𝔭₁</text><text x="410" y="109" text-anchor="middle" fill="#285b43" font-family="serif" font-size="16">𝔭₂</text><text x="280" y="125" text-anchor="middle" fill="#718074" font-family="monospace" font-size="9">two distinct prime ideals</text></svg>`,
+  source: "K = QuadraticField(-23)\nideals = K.primes_above(2)\nprint(len(ideals))  # 2\nprint(ideals)  # the two prime ideals above 2"
+};
+
 const storageKey = "nt-fieldnotes-progress-v2";
 let completed = new Set();
 try { completed = new Set(JSON.parse(localStorage.getItem(storageKey) || "[]")); } catch {}
@@ -320,6 +667,7 @@ let mountedKernel = null;
 let notebookGeneration = 0;
 const $ = (selector, root = document) => root.querySelector(selector);
 const clean = (value) => value.toLowerCase().replace(/[\s*×,()=]/g, "").replace(/[−–]/g, "-");
+const escapeHtml = (value) => String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
 
 function disposeNotebook() {
   notebookGeneration += 1;
@@ -411,10 +759,14 @@ function render() {
   disposeNotebook();
   renderNav(); renderProgress();
   const lesson = lessons[current], chapter = chapters[lesson.chapter], solved = completed.has(lesson.id);
+  const support = lessonSupport[lesson.id];
   const panel = $("#lesson-panel");
   const firstInChapter = current === 0 || lessons[current - 1].chapter !== lesson.chapter;
   const chapterLesson = lessons.slice(0, current).filter(item => item.chapter === lesson.chapter).length + 1;
   const chapterIntro = firstInChapter ? `<div class="chapter-intro"><b>CHAPTER ${String(lesson.chapter + 1).padStart(2, "0")} · ${chapter.title}</b><p>${chapter.overview}</p><span>${chapter.goals}</span></div>` : "";
+  const definitionBox = `<section class="learning-box definition-box" aria-label="New definitions"><h3><span class="learning-box-icon">D</span>New definitions</h3><dl>${support.definitions.map(([term, definition]) => `<div><dt>${escapeHtml(term)}</dt><dd>${escapeHtml(definition)}</dd></div>`).join("")}</dl></section>`;
+  const toolBox = `<section class="learning-box tool-box" aria-label="New Sagebrush code tools"><h3><span class="learning-box-icon">{ }</span>New code tools · Sage mode</h3><dl>${support.tools.map(([name, description]) => `<div><dt><code>${escapeHtml(name)}</code></dt><dd>${escapeHtml(description)}</dd></div>`).join("")}</dl><p class="tool-note">Sage mode accepts Python-style assignment, loops, and lists. Sage's <code>^</code> means exponentiation; in regular Python use <code>**</code>.</p></section>`;
+  const visual = support.visual ? `<figure class="math-visual"><figcaption><strong>${escapeHtml(support.visual.title)}</strong><span>${escapeHtml(support.visual.caption)}</span></figcaption>${support.visual.svg}<details><summary>Recreate the figure's data with Sage/Python</summary><pre><code>${escapeHtml(support.visual.source)}</code></pre></details></figure>` : "";
   panel.innerHTML = `
     <div class="module-meta"><span class="module-tag">${lesson.topic}</span><span>CH ${String(lesson.chapter + 1).padStart(2, "0")} · LESSON ${chapterLesson} / 4</span><span>·</span><span>${lesson.time}</span></div>
     <div class="module-heading"><h2>${lesson.title}</h2><span class="solved-stamp ${solved ? "show" : ""}">✓ SOLVED</span></div>
@@ -422,6 +774,7 @@ function render() {
     <p class="module-lede">${lesson.lede}</p>
     <div class="question-card"><span class="question-symbol">?</span><div><p class="question-label">YOUR PROBLEM</p><p>${lesson.question}</p></div></div>
     <p class="idea-row"><span class="bulb">✳</span><span><b>The idea.</b> ${lesson.idea}</span></p>
+    <div class="learning-resources">${definitionBox}${toolBox}${visual}</div>
     <section class="notebook-card" aria-labelledby="notebook-heading">
       <div class="notebook-heading"><div><p class="notebook-kicker">YOUR NUMBER THEORY LAB · SAGE MODE</p><h3 id="notebook-heading">Compute it here</h3></div><a class="notebook-popout" href="${notebookLink(lesson)}" target="_blank" rel="noopener noreferrer">Open in a separate tab <span aria-hidden="true">↗</span></a></div>
       <div class="notebook-host" id="sagebrush-notebook" aria-label="Sagebrush Sage notebook"><p class="notebook-loading" role="status">Starting Sagebrush…</p></div>
