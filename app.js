@@ -313,8 +313,63 @@ const storageKey = "nt-fieldnotes-progress-v2";
 let completed = new Set();
 try { completed = new Set(JSON.parse(localStorage.getItem(storageKey) || "[]")); } catch {}
 let current = 0;
+let notebookModulePromise;
+let notebookDbPromise;
+let mountedNotebook = null;
+let mountedKernel = null;
+let notebookGeneration = 0;
 const $ = (selector, root = document) => root.querySelector(selector);
 const clean = (value) => value.toLowerCase().replace(/[\s*×,()=]/g, "").replace(/[−–]/g, "-");
+
+function disposeNotebook() {
+  notebookGeneration += 1;
+  const oldNotebook = mountedNotebook;
+  mountedNotebook = null;
+  if (oldNotebook) void oldNotebook.flush().catch(() => {}).finally(() => oldNotebook.destroy());
+  mountedKernel?.close();
+  mountedKernel = null;
+}
+
+async function mountNotebook(lesson, host, generation) {
+  try {
+    notebookModulePromise ||= import("./vendor/sagebrush/sagebrush-notebook.js");
+    notebookDbPromise ||= notebookModulePromise.then(({ openDb }) => openDb("number-theory-fieldnotes"));
+    const [{ createNotebook, WorkerKernel, IdbStore, cellId }, db] = await Promise.all([notebookModulePromise, notebookDbPromise]);
+    if (generation !== notebookGeneration || !host.isConnected) return;
+    const kernel = new WorkerKernel({
+      createWorker: () => new Worker(new URL("./vendor/sagebrush/sagebrush-worker.js", document.baseURI), { type: "module" })
+    });
+    const notebook = createNotebook(host, {
+      kernel,
+      mode: "sage",
+      assetBase: new URL("./vendor/sagebrush/", document.baseURI).href
+    });
+    mountedKernel = kernel;
+    mountedNotebook = notebook;
+    const cells = [
+      {
+        id: cellId(),
+        type: "markdown",
+        code: `# ${lesson.title}\n\n${lesson.lede}\n\n**Problem:** ${lesson.question.replace(/<[^>]*>/g, "")}\n\nEdit the starter cell below and press **Shift+Enter** to run it.`
+      },
+      { id: cellId(), code: lesson.starter }
+    ];
+    kernel.start();
+    await notebook.attach(new IdbStore(db, `fieldnotes-${lesson.id}`, { name: lesson.title, mode: "sage", cells }));
+    if (generation !== notebookGeneration) {
+      notebook.destroy();
+      kernel.close();
+      if (mountedNotebook === notebook) mountedNotebook = null;
+      if (mountedKernel === kernel) mountedKernel = null;
+    }
+  } catch (error) {
+    if (generation !== notebookGeneration || !host.isConnected) return;
+    const message = document.createElement("p");
+    message.className = "notebook-error";
+    message.textContent = `Sagebrush could not start here: ${error?.message ?? error}. You can still open the notebook in a separate tab.`;
+    host.replaceChildren(message);
+  }
+}
 
 function notebookLink(lesson) {
   const data = JSON.stringify([
@@ -353,6 +408,7 @@ function renderProgress() {
 }
 
 function render() {
+  disposeNotebook();
   renderNav(); renderProgress();
   const lesson = lessons[current], chapter = chapters[lesson.chapter], solved = completed.has(lesson.id);
   const panel = $("#lesson-panel");
@@ -366,10 +422,15 @@ function render() {
     <p class="module-lede">${lesson.lede}</p>
     <div class="question-card"><span class="question-symbol">?</span><div><p class="question-label">YOUR PROBLEM</p><p>${lesson.question}</p></div></div>
     <p class="idea-row"><span class="bulb">✳</span><span><b>The idea.</b> ${lesson.idea}</span></p>
-    <div class="launch-row"><a class="launch-button" href="${notebookLink(lesson)}" target="_blank" rel="noopener noreferrer"><span>Open Sagebrush notebook</span><span class="arrow" aria-hidden="true">↗</span></a><span class="launch-hint">Editable Sage notebook · opens in a new tab</span></div>
+    <section class="notebook-card" aria-labelledby="notebook-heading">
+      <div class="notebook-heading"><div><p class="notebook-kicker">YOUR NUMBER THEORY LAB · SAGE MODE</p><h3 id="notebook-heading">Compute it here</h3></div><a class="notebook-popout" href="${notebookLink(lesson)}" target="_blank" rel="noopener noreferrer">Open in a separate tab <span aria-hidden="true">↗</span></a></div>
+      <div class="notebook-host" id="sagebrush-notebook" aria-label="Sagebrush Sage notebook"><p class="notebook-loading" role="status">Starting Sagebrush…</p></div>
+      <p class="notebook-caption">This editable Sagebrush notebook runs in your browser. Change the starter code and press <kbd>Shift</kbd> + <kbd>Enter</kbd> to run it.</p>
+    </section>
     <details class="work-hint"><summary>Need a nudge?</summary><p>${lesson.hint}</p></details>
     <div class="answer-block"><p class="answer-title">BRING YOUR RESULT BACK HERE</p><form class="answer-form" id="answer-form"><input class="answer-input" id="answer-input" autocomplete="off" spellcheck="false" aria-label="Your answer" placeholder="${lesson.placeholder}" ${solved ? "disabled" : ""}><button class="check-button" type="submit" ${solved ? "disabled" : ""}>${solved ? "Solved ✓" : "Check answer"}</button></form><p class="answer-feedback ${solved ? "good" : ""}" id="answer-feedback" aria-live="polite">${solved ? lesson.success : "Use the Sagebrush notebook to work it out, then enter your result."}</p></div>
     <div class="lesson-bottom"><span class="lesson-bottom-note">${lesson.concept}</span>${current > 0 ? `<button class="prev-button" id="prev-button" type="button">← Previous</button>` : ""}<button class="next-button ${solved && current < lessons.length - 1 ? "show" : ""}" id="next-button" type="button">${current === lessons.length - 1 ? "Curriculum complete" : "Next lesson"}<span>→</span></button></div>`;
+  mountNotebook(lesson, $("#sagebrush-notebook", panel), notebookGeneration);
   $("#answer-form", panel).addEventListener("submit", event => {
     event.preventDefault();
     const entry = clean($("#answer-input", panel).value);
@@ -377,9 +438,15 @@ function render() {
     if (lesson.answer.map(clean).includes(entry)) {
       completed.add(lesson.id);
       localStorage.setItem(storageKey, JSON.stringify([...completed]));
-      render();
+      renderNav();
+      renderProgress();
+      $(".solved-stamp", panel).classList.add("show");
+      $("#answer-input", panel).disabled = true;
+      $(".check-button", panel).disabled = true;
+      $(".check-button", panel).textContent = "Solved ✓";
       $("#answer-feedback", panel).textContent = lesson.success;
       $("#answer-feedback", panel).className = "answer-feedback good";
+      if (current < lessons.length - 1) $("#next-button", panel).classList.add("show");
     } else {
       feedback.textContent = entry ? "Not quite. Inspect your Sagebrush output and try again." : "Run the Sagebrush computation, then enter your result.";
       feedback.className = "answer-feedback try";

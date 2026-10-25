@@ -1,6 +1,6 @@
 # Number Theory Fieldnotes
 
-A static, GitHub Pages course for computational number theory and Sagebrush. It has six chapters and 24 lessons, moving from divisibility and modular arithmetic to finite fields, RSA, quadratic fields, and class groups. Learners write their own code in an editable Sage-mode notebook at Sagebrush.space, then check their result in the course. Answer progress is saved in the browser's local storage.
+A static, GitHub Pages course for computational number theory and Sagebrush. It has six chapters and 24 lessons, moving from divisibility and modular arithmetic to finite fields, RSA, quadratic fields, and class groups. Every lesson embeds its own editable Sage-mode Sagebrush notebook in the page, so learners can compute and check their result without leaving the course. A separate-tab link is available as a fallback. Lesson notebooks and course progress are saved in this browser.
 
 ## Curriculum
 
@@ -13,7 +13,7 @@ A static, GitHub Pages course for computational number theory and Sagebrush. It 
 
 ## Run locally
 
-Open `index.html` in a browser or serve the folder with any static file server. The Sagebrush notebooks open at Sagebrush.space and run in the browser.
+Open `index.html` in a browser or serve the folder with any static file server. The Sagebrush notebook component and its Web Worker, WebAssembly engine, and library chunks are vendored under `vendor/sagebrush/` so GitHub Pages can serve the worker from the course's origin. All code executes in the learner's browser. The vendored Sagebrush 0.6.1 files are under MIT or Apache-2.0; their licenses and third-party notices are in `vendor/sagebrush/`.
 
 ## Publish on GitHub Pages
 
