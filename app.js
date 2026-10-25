@@ -1,8 +1,8 @@
 const chapters = [
   {
     id: "integer-arithmetic", title: "Integer structure", short: "Integers",
-    overview: "Build the vocabulary of number theory: divisibility, gcds, prime factorization, and the arithmetic functions that summarize them.",
-    goals: "By the end, use the Euclidean algorithm, recognize prime factors, and compute divisor counts and Euler's totient."
+    overview: "Build the vocabulary of number theory: divisibility, gcds, prime factorization, coprimality, and arithmetic modulo n.",
+    goals: "By the end, use the Euclidean algorithm, factor integers, test whether numbers are coprime, calculate with remainders, and then use Euler's totient."
   },
   {
     id: "congruences", title: "Congruences & cycles", short: "Congruences",
@@ -67,6 +67,28 @@ const lessons = [
     concept: "Prime factorization is the integer analogue of writing a polynomial as a product of irreducibles."
   },
   {
+    id: "coprime", chapter: 0, title: "Decide when two integers are coprime", topic: "COPRIMALITY", time: "5 MIN",
+    lede: "Two integers can both be composite and still have no common factor. Their gcd gives a simple test for coprimality.",
+    question: "Are <span class=\"math\">35</span> and <span class=\"math\">64</span> coprime? Compute their gcd and enter it; a gcd of 1 means yes.",
+    idea: "The prime factors are 35 = 5·7 and 64 = 2⁶, so they share no prime factor. Coprimality is about shared factors, not whether each number is prime.",
+    starter: "# Check whether 35 and 64 have any common factor\na, b = 35, 64\ng = gcd(a, b)\n\n# The final expression is displayed as the notebook output\ng",
+    hint: "Run <code>gcd(a, b)</code>. If it returns 1, no integer greater than 1 divides both inputs.",
+    answer: ["1"], placeholder: "gcd(35, 64) = ?",
+    success: "Correct: the gcd is 1, so 35 and 64 are coprime. Neither number needs to be prime.",
+    concept: "Coprimality tells us when a number can be divided by modulo n."
+  },
+  {
+    id: "modular-arithmetic", chapter: 0, title: "Do arithmetic modulo n", topic: "MODULAR ARITHMETIC", time: "6 MIN",
+    lede: "In modular arithmetic, we keep only the remainder after division by a fixed positive integer called the modulus.",
+    question: "Compute <span class=\"math\">(17 + 9)·5 modulo 7</span>. Reduce the values as you go and enter the final remainder.",
+    idea: "Modulo 7, 17 has remainder 3 and 9 has remainder 2. So (17+9)·5 has the same remainder as (3+2)·5 = 25, which is 4 modulo 7.",
+    starter: "# Sage will reduce each value modulo 7 as you calculate\na = Mod(17, 7)\nb = Mod(9, 7)\nresult = (a + b) * 5\n\n# Display the resulting residue\nresult",
+    hint: "Use <code>Mod(value, modulus)</code> to create a residue class. Sage reduces sums and products automatically; with plain integers, <code>value % modulus</code> gives the remainder.",
+    answer: ["4"], placeholder: "remainder = ?",
+    success: "Yes: 26·5 = 130, and 130 = 18·7 + 4, so the remainder is 4.",
+    concept: "This is the basic arithmetic behind the congruences and modular powers in Chapter 2."
+  },
+  {
     id: "totient", chapter: 0, title: "Count the coprime residues", topic: "ARITHMETIC FUNCTIONS", time: "6 MIN",
     lede: "Euler's totient φ(n) counts the integers from 1 through n that are coprime to n.",
     question: "How many residues <span class=\"math\">a</span> modulo <span class=\"math\">360</span> have <span class=\"math\">gcd(a, 360) = 1</span>?",
@@ -75,7 +97,7 @@ const lessons = [
     hint: "Compare a direct count with Sage's <code>euler_phi(n)</code>. What does the prime factorization tell you about the formula?",
     answer: ["96"], placeholder: "φ(360) = ?",
     success: "Right: φ(360) = 96. Exactly 96 residue classes have multiplicative inverses modulo 360.",
-    concept: "The totient links factorization to the size of the group of units modulo n."
+    concept: "The totient counts exactly the residue classes modulo n that have a multiplicative inverse."
   },
 
   // Chapter 2 · Congruences
@@ -351,6 +373,32 @@ const lessonSupport = {
     tools: [
       ["factor(n)", "Returns Sage's prime factorization of n as prime/exponent pairs. For example, factor(12) displays 2^2 * 3; the factors are certified prime for these inputs."],
       ["prod(p^e for p,e in factor(n))", "A Sage/Python product expression that multiplies each prime p to its exponent e. It reconstructs n, so it is a useful check. Sage uses ^ for exponentiation; in ordinary Python use ** instead."]
+    ]
+  },
+  coprime: {
+    definitions: [
+      ["Common divisor", "An integer that divides both numbers. For 35 and 64, the only positive common divisor is 1."],
+      ["Coprime (relatively prime)", "Two integers are coprime when their greatest common divisor is 1. This does not mean that either integer must itself be prime."],
+      ["Prime factors", "The prime numbers in an integer's prime factorization. If two numbers share a divisor greater than 1, they share at least one prime factor."]
+    ],
+    tools: [
+      ["gcd(a, b)", "Sage's greatest-common-divisor function. It returns the largest positive integer dividing both a and b; gcd(35,64) returns 1."],
+      ["g == 1", "A comparison that returns True when the gcd equals 1 and False otherwise. This is the direct coprimality test."],
+      ["Final expression in a cell", "Sagebrush displays the value of the last expression in a code cell. Writing g on the final line shows the gcd you assigned above."]
+    ]
+  },
+  "modular-arithmetic": {
+    definitions: [
+      ["Modulus", "The positive integer n that determines which remainders we keep. Here the modulus is 7."],
+      ["Remainder / residue", "The value left after division by n, chosen from 0 through n-1. For example, 17 has remainder 3 modulo 7."],
+      ["Modular arithmetic", "Arithmetic on residue classes, where numbers that differ by a multiple of n are treated as equal. Addition and multiplication can be done on remainders and reduced after each operation."],
+      ["Congruence", "a ≡ b (mod n) means n divides a-b, or equivalently a and b have the same remainder after division by n."]
+    ],
+    tools: [
+      ["Mod(value, n)", "Creates Sage's residue class of value modulo n. For example, Mod(17,7) represents the same modular value as 3; sums and products remain reduced modulo 7."],
+      ["%", "For ordinary integers, a % n returns the remainder of a divided by n. For example, 17 % 7 returns 3."],
+      ["+, *", "Addition and multiplication. When the inputs are Sage Mod objects, these operations automatically return the result modulo the chosen modulus."],
+      ["Sage mode power syntax", "This lesson only needs + and *. In Sage mode, ^ is exponentiation; ordinary Python uses **. The notebook is running Sage mode."]
     ]
   },
   totient: {
@@ -762,13 +810,14 @@ function render() {
   const support = lessonSupport[lesson.id];
   const panel = $("#lesson-panel");
   const firstInChapter = current === 0 || lessons[current - 1].chapter !== lesson.chapter;
+  const chapterLessons = lessons.filter(item => item.chapter === lesson.chapter).length;
   const chapterLesson = lessons.slice(0, current).filter(item => item.chapter === lesson.chapter).length + 1;
   const chapterIntro = firstInChapter ? `<div class="chapter-intro"><b>CHAPTER ${String(lesson.chapter + 1).padStart(2, "0")} · ${chapter.title}</b><p>${chapter.overview}</p><span>${chapter.goals}</span></div>` : "";
   const definitionBox = `<section class="learning-box definition-box" aria-label="New definitions"><h3><span class="learning-box-icon">D</span>New definitions</h3><dl>${support.definitions.map(([term, definition]) => `<div><dt>${escapeHtml(term)}</dt><dd>${escapeHtml(definition)}</dd></div>`).join("")}</dl></section>`;
   const toolBox = `<section class="learning-box tool-box" aria-label="New Sagebrush code tools"><h3><span class="learning-box-icon">{ }</span>New code tools · Sage mode</h3><dl>${support.tools.map(([name, description]) => `<div><dt><code>${escapeHtml(name)}</code></dt><dd>${escapeHtml(description)}</dd></div>`).join("")}</dl><p class="tool-note">Sage mode accepts Python-style assignment, loops, and lists. Sage's <code>^</code> means exponentiation; in regular Python use <code>**</code>.</p></section>`;
   const visual = support.visual ? `<figure class="math-visual"><figcaption><strong>${escapeHtml(support.visual.title)}</strong><span>${escapeHtml(support.visual.caption)}</span></figcaption>${support.visual.svg}<details><summary>Recreate the figure's data with Sage/Python</summary><pre><code>${escapeHtml(support.visual.source)}</code></pre></details></figure>` : "";
   panel.innerHTML = `
-    <div class="module-meta"><span class="module-tag">${lesson.topic}</span><span>CH ${String(lesson.chapter + 1).padStart(2, "0")} · LESSON ${chapterLesson} / 4</span><span>·</span><span>${lesson.time}</span></div>
+    <div class="module-meta"><span class="module-tag">${lesson.topic}</span><span>CH ${String(lesson.chapter + 1).padStart(2, "0")} · LESSON ${chapterLesson} / ${chapterLessons}</span><span>·</span><span>${lesson.time}</span></div>
     <div class="module-heading"><h2>${lesson.title}</h2><span class="solved-stamp ${solved ? "show" : ""}">✓ SOLVED</span></div>
     ${chapterIntro}
     <p class="module-lede">${lesson.lede}</p>
