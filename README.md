@@ -1,6 +1,6 @@
 # Number Theory Fieldnotes
 
-A static, GitHub Pages course for computational number theory and Sagebrush. It has seven chapters and 34 lessons, introducing prime numbers before factorization, then coprimality and modular arithmetic before Euler's totient, followed by finite fields and their unit groups, RSA, quadratic fields and class groups, and elliptic curves. Selected lessons include short proof prompts alongside computation. Every lesson embeds its own editable Sage-mode Sagebrush notebook in the page, so learners can compute and check their result without leaving the course. A separate-tab link is available as a fallback. Lesson notebooks and course progress are saved in this browser.
+A static, GitHub Pages course for computational number theory and Sagebrush. It has seven chapters and 34 lessons, introducing prime numbers before factorization, then coprimality and modular arithmetic before Euler's totient, followed by finite fields and their unit groups, RSA, quadratic fields and class groups, and elliptic curves. Algorithm lessons now move from plain-language pseudocode to learner-written Sage, with staged hints and built-in routines available for checking results. Selected lessons also include short proof prompts. Every lesson embeds its own editable Sage-mode Sagebrush notebook in the page, so learners can compute and check their result without leaving the course. A separate-tab link is available as a fallback. Lesson notebooks and course progress are saved in this browser.
 
 ## Curriculum
 

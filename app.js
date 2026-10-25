@@ -41,10 +41,11 @@ const lessons = [
   {
     id: "gcd", chapter: 0, title: "Find a greatest common divisor", topic: "DIVISIBILITY", time: "5 MIN",
     lede: "Number theory starts with divisibility. The greatest common divisor is the largest integer that divides both inputs.",
+    algorithm: { title: "Plan in pseudocode", prompt: "Translate this loop into Sage. Fill the two TODO lines, run it, and confirm it prints 18.", pseudocode: "while b is not 0:\n    remainder ← a divided by b\n    a ← b\n    b ← remainder\nreturn a" },
     question: "Find <span class=\"math\">gcd(252, 198)</span>. Then check that your answer divides both numbers.",
     idea: "The Euclidean algorithm replaces a pair (a, b) with (b, a mod b). The gcd stays the same while the remainders shrink.",
-    starter: "# Start with the two integers\na, b = 252, 198\n\n# Use Sage to find their gcd, then verify divisibility\n",
-    hint: "Try <code>gcd(a, b)</code>. To see the Euclidean algorithm at work, inspect <code>a % b</code>, then repeat with the smaller pair.",
+    starter: "# Start with the two integers\na, b = 252, 198\n\n# TODO: repeat while b is nonzero\nwhile TODO:\n    # TODO: save a % b before changing a or b\n    pass\n\nprint(a)",
+    hints: ["The loop condition should be <code>b != 0</code>.", "Save the remainder first: <code>r = a % b</code>.", "Then update in order: <code>a = b</code>, followed by <code>b = r</code>.", "The Sage function <code>gcd(a,b)</code> can check your result after your own loop works."],
     answer: ["18"], placeholder: "gcd(252, 198) = ?",
     success: "Correct: 18 divides both 252 and 198, and no larger positive integer does.",
     proof: "Why does replacing (a, b) by (b, a mod b) preserve the common divisors? Use that fact to explain why the Euclidean algorithm returns the gcd.",
@@ -53,10 +54,11 @@ const lessons = [
   {
     id: "bezout", chapter: 0, title: "Recover Bézout coefficients", topic: "EUCLIDEAN ALGORITHM", time: "6 MIN",
     lede: "The extended Euclidean algorithm does more than find a gcd: it writes the gcd as an integer combination of its inputs.",
+    algorithm: { title: "Plan in pseudocode", prompt: "Track the remainders and the coefficients of a. Complete the TODOs, then check the identity.", pseudocode: "old_r, r ← a, b\nold_s, s ← 1, 0\nwhile r is not 0:\n    q ← old_r divided by r\n    old_r, r ← r, old_r − q*r\n    old_s, s ← s, old_s − q*s\nreturn old_r, old_s" },
     question: "Find an integer <span class=\"math\">u</span> such that <span class=\"math\">252u + 198v = 18</span> for some integer <span class=\"math\">v</span>. What is the coefficient Sage returns for 252?",
     idea: "Bézout's identity says gcd(a,b) = au + bv. The returned coefficients prove the gcd and later give modular inverses.",
-    starter: "# Look for integers u and v with 252*u + 198*v = gcd(252, 198)\na, b = 252, 198\n\n# Find and check a Bézout identity\n",
-    hint: "Run <code>xgcd(a, b)</code>. Sage returns (g, u, v), then verify <code>a*u + b*v == g</code>.",
+    starter: "# Look for integers u and v with 252*u + 198*v = gcd(252, 198)\na, b = 252, 198\nold_r, r = a, b\nold_s, s = 1, 0\n\nwhile TODO:\n    # TODO: compute the quotient q = old_r // r\n    q = 0\n    # TODO: update the remainder pair using the old values together\n    old_r, r = old_r, r\n    # TODO: update the coefficient pair for a\n    old_s, s = old_s, s\n\ng, u = old_r, old_s\nv = (g - a*u) // b\nprint(g, u, v)\nprint(a*u + b*v)",
+    hints: ["Use <code>while r != 0</code>; Python's <code>//</code> gives integer division.", "Use simultaneous assignment: <code>old_r, r = r, old_r - q*r</code>. The right side is evaluated before either variable changes.", "Update coefficients the same way: <code>old_s, s = s, old_s - q*s</code>. When the loop ends, <code>old_s</code> is u.", "Use <code>xgcd(a,b)</code> only to compare after your loop; it returns (g,u,v)."],
     answer: ["4"], placeholder: "coefficient u = ?",
     success: "Yes. One identity is 252·4 + 198·(−5) = 18.",
     proof: "Starting from the Euclidean algorithm's remainder equations, explain how working backward writes the final nonzero remainder as an integer combination of the original inputs.",
@@ -76,10 +78,11 @@ const lessons = [
   {
     id: "factor-small", chapter: 0, title: "Split an integer into primes", topic: "FUNDAMENTAL THEOREM OF ARITHMETIC", time: "5 MIN",
     lede: "Every integer greater than 1 has exactly one prime factorization, apart from the order of its factors.",
+    algorithm: { title: "Plan in pseudocode", prompt: "Translate the trial-division loop into Sage. Keep dividing by d when it works; otherwise advance d.", pseudocode: "remaining ← n; d ← 2\nwhile d*d ≤ remaining:\n    if d divides remaining:\n        record d; divide remaining by d\n    else:\n        d ← d + 1\nif remaining > 1: record remaining" },
     question: "Find the prime factorization of <span class=\"math\">8051</span>. Which two primes multiply to make it?",
     idea: "A factorization records each prime and its exponent. This compact description is the basic data behind many arithmetic functions.",
-    starter: "# Find prime factors of n, and check that their product is n\nn = 8051\n\n",
-    hint: "Try <code>factor(n)</code>. The answer is a product of prime powers; multiply the factors back together as a check.",
+    starter: "# Trial division: build a list of prime factors\nn = 8051\nremaining = n\nd = 2\nfactors = []\n\n# TODO: try each divisor while d*d <= remaining\nwhile TODO:\n    # TODO: when d divides remaining, record it and divide it out\n    pass\n\n# Any remaining value greater than 1 is prime\nif remaining > 1:\n    factors.append(remaining)\nprint(factors)",
+    hints: ["Use <code>while d*d <= remaining</code>; this avoids needing a square-root function.", "Test divisibility with <code>remaining % d == 0</code>. If true, append d and set <code>remaining = remaining // d</code>.", "If d does not divide, advance d by one. Once the loop ends, append remaining if it is greater than 1.", "Check by multiplying the list: <code>prod(factors)</code> should recover n. Sage's <code>factor(n)</code> is a comparison, not the algorithm you are writing."],
     answer: ["83*97", "83 97", "83,97", "97*83", "97 83", "97,83"], placeholder: "prime factors of 8051",
     success: "Exactly: 8051 = 83 × 97, with both factors prime.",
     proof: "Suppose an integer has two prime factorizations. Use Euclid's lemma (if a prime divides a product, it divides one factor) to show one prime in the first factorization must match a prime in the second. What can you cancel, and how do you finish by induction?",
@@ -110,10 +113,11 @@ const lessons = [
   {
     id: "totient", chapter: 0, title: "Count integers coprime to n", topic: "ARITHMETIC FUNCTIONS", time: "5 MIN",
     lede: "Euler's totient φ(n) counts the integers from 1 through n that are coprime to n.",
+    algorithm: { title: "Plan in pseudocode", prompt: "Use a loop and gcd to count exactly the integers in the definition.", pseudocode: "count ← 0\nfor k from 1 through n:\n    if gcd(k,n) equals 1:\n        count ← count + 1\nreturn count" },
     question: "Which integers from <span class=\"math\">1</span> through <span class=\"math\">12</span> are coprime to 12? How many are there? Enter that count, φ(12).",
     idea: "Check gcd(a,12) for each integer a from 1 through 12. The ones with gcd 1 are 1, 5, 7, and 11, so the count is 4.",
-    starter: "# Count the integers from 1 through n that are coprime to n\nn = 12\neuler_phi(n)",
-    hint: "Use the definition to list the integers from 1 through 12 whose gcd with 12 is 1. Then compare your count with Sage's <code>euler_phi(12)</code>.",
+    starter: "# Count the integers from 1 through n that are coprime to n\nn = 12\ncount = 0\n\n# TODO: loop over every integer k from 1 through n\nfor k in TODO:\n    # TODO: increase count only when gcd(k,n) equals 1\n    pass\n\nprint(count)",
+    hints: ["<code>range(1,n+1)</code> includes 1 and n; the endpoint itself is excluded, so add 1.", "Test <code>gcd(k,n) == 1</code> inside the loop.", "Add one with <code>count += 1</code>. Compare your answer with <code>euler_phi(n)</code> after the loop."],
     answer: ["4"], placeholder: "φ(12) = ?",
     success: "Correct: φ(12) = 4. The four integers are 1, 5, 7, and 11.",
     concept: "For now, φ(n) is simply a count. Later we will use this count when studying modular inverses."
@@ -123,10 +127,11 @@ const lessons = [
   {
     id: "remainders", chapter: 1, title: "Compute with remainders", topic: "RESIDUE CLASSES", time: "5 MIN",
     lede: "Two integers are congruent modulo m when they have the same remainder after division by m.",
+    algorithm: { title: "Plan in pseudocode · square and multiply", prompt: "Write a function that follows the exponent's binary digits by repeatedly halving it.", pseudocode: "result ← 1; base ← a mod m\nwhile exponent > 0:\n    if exponent is odd: result ← result*base mod m\n    base ← base*base mod m\n    exponent ← floor(exponent/2)\nreturn result" },
     question: "Find the remainder when <span class=\"math\">37¹⁰⁰</span> is divided by <span class=\"math\">101</span>. Before calculating, guess whether repeated powers cycle.",
     idea: "There are only 101 possible remainders modulo 101. Repeated multiplication must eventually cycle, so a huge power can have a small answer. This example is meant to reveal a pattern; a later lesson explains why this particular power is 1.",
-    starter: "# Compute the remainder without constructing the huge power\na, exponent, modulus = 37, 100, 101\n\n",
-    hint: "Use <code>power_mod(a, exponent, modulus)</code>. Compare it with <code> (a^exponent) % modulus</code> for this small example.",
+    starter: "# Implement square-and-multiply modular exponentiation\ndef mod_exp(a, exponent, modulus):\n    result = 1\n    base = a % modulus\n    while TODO:\n        # TODO: if exponent is odd, multiply base into result\n        pass\n        # TODO: square base modulo modulus\n        pass\n        # TODO: halve the exponent using integer division\n        pass\n    return result\n\na, exponent, modulus = 37, 100, 101\nmod_exp(a, exponent, modulus)",
+    hints: ["The loop condition is <code>exponent > 0</code>.", "An odd integer has <code>exponent % 2 == 1</code>. In that case update <code>result = (result * base) % modulus</code>.", "Every round, set <code>base = (base * base) % modulus</code> and halve with <code>exponent = exponent // 2</code>.", "Compare your finished function with Sage's <code>power_mod(a, exponent, modulus)</code>."],
     answer: ["1"], placeholder: "remainder = ?",
     success: "Correct: the remainder is 1. A later lesson in this chapter explains why this power returns 1, using Fermat's little theorem.",
     concept: "Congruence lets us replace an enormous integer with a small residue without losing the modular result."
@@ -134,10 +139,11 @@ const lessons = [
   {
     id: "inverse", chapter: 1, title: "Undo multiplication modulo n", topic: "MODULAR INVERSES", time: "6 MIN",
     lede: "An inverse of a modulo n is a number u with au congruent to 1. It is the modular version of division.",
+    algorithm: { title: "Plan in pseudocode", prompt: "Search the possible residues until one multiplies by a to give remainder 1.", pseudocode: "for candidate from 1 through n−1:\n    if (a*candidate) mod n equals 1:\n        return candidate\nreport that no inverse was found" },
     question: "The four integers counted by <span class=\"math\">φ(12)</span> are 1, 5, 7, and 11. Find the multiplicative inverse of 5 modulo 12: find <span class=\"math\">u</span> with <span class=\"math\">5u ≡ 1 (mod 12)</span>.",
     idea: "The totient lesson counted integers coprime to 12. Now we find an inverse for one of them: 5 and 12 are coprime, so Bézout's identity guarantees an inverse.",
-    starter: "# Find u such that 5*u differs from 1 by a multiple of 12\na, n = 5, 12\n\n# Check the gcd before looking for an inverse\n",
-    hint: "Try <code>inverse_mod(a, n)</code>, then verify <code>(a*u) % n</code> is 1.",
+    starter: "# Search for an inverse of a modulo n\na, n = 5, 12\nu = None\n\n# TODO: test each candidate residue from 1 up to n-1\nfor candidate in TODO:\n    # TODO: if a*candidate has remainder 1, save it and stop\n    pass\n\nprint(u)",
+    hints: ["Use <code>range(1,n)</code> to test candidates 1 through n−1.", "The condition is <code>(a*candidate) % n == 1</code>.", "When it matches, assign <code>u = candidate</code> and use <code>break</code> to stop the loop.", "Then verify with <code>inverse_mod(a,n)</code>, Sage's built-in function."],
     answer: ["5"], placeholder: "inverse = ?",
     success: "Exactly: 5 × 5 = 25 = 1 + 2 × 12, so 5 is its own inverse modulo 12.",
     proof: "Show both directions: if au ≡ 1 (mod n), then any common divisor of a and n divides 1; conversely, if gcd(a,n)=1, Bézout's identity gives an inverse modulo n.",
@@ -157,10 +163,11 @@ const lessons = [
   {
     id: "crt", chapter: 1, title: "Reconcile two repeating clocks", topic: "CHINESE REMAINDER THEOREM", time: "6 MIN",
     lede: "A congruence describes a repeating schedule. The Chinese remainder theorem finds when two schedules coincide.",
+    algorithm: { title: "Plan in pseudocode", prompt: "Search one full combined cycle. The first matching candidate is the least nonnegative solution.", pseudocode: "period ← m*n\nfor x from 0 through period−1:\n    if x mod m = a and x mod n = b:\n        return x" },
     question: "Find the least positive <span class=\"math\">x</span> with <span class=\"math\">x ≡ 2 (mod 9)</span> and <span class=\"math\">x ≡ 3 (mod 8)</span>.",
     idea: "Since 8 and 9 are coprime, there is one solution modulo 72. Check a candidate by reducing it modulo each clock's period.",
-    starter: "# Find a number in both residue classes\na, m = 2, 9\nb, n = 3, 8\n\n# Check your result against both congruences\n",
-    hint: "Try <code>crt(a, b, m, n)</code>. Sage returns a representative of the shared residue class.",
+    starter: "# Search for the first number matching both congruences\na, m = 2, 9\nb, n = 3, 8\nperiod = m*n\nsolution = None\n\n# TODO: test x values from 0 through period-1\nfor x in TODO:\n    # TODO: keep x when both remainders match\n    pass\n\nprint(solution)",
+    hints: ["Use <code>range(period)</code>, which visits 0 through period−1.", "Use a condition with <code>and</code>: <code>x % m == a and x % n == b</code>.", "When it matches, save x to <code>solution</code> and <code>break</code>; then check both congruences.", "Compare with <code>crt(a,b,m,n)</code> after your search works."],
     answer: ["11", "11mod72", "11(mod72)"], placeholder: "least positive x",
     success: "Correct: 11 leaves remainders 2 and 3. All solutions are 11 modulo 72.",
     proof: "If x and y both solve the two congruences, show that x−y is divisible by both coprime moduli 8 and 9. Why must it then be divisible by 72?",
@@ -171,10 +178,11 @@ const lessons = [
   {
     id: "primality", chapter: 2, title: "Test a prime candidate", topic: "PRIMALITY", time: "5 MIN",
     lede: "A prime has no positive divisors other than 1 and itself. For large inputs, testing that property is an algorithmic problem.",
+    algorithm: { title: "Plan in pseudocode · trial division", prompt: "Check possible divisors only while d² ≤ n. Translate the loop and return the Boolean answer.", pseudocode: "d ← 2\nwhile d*d ≤ n:\n    if d divides n: return false\n    d ← d + 1\nreturn true" },
     question: "Is <span class=\"math\">104729</span> prime? Use Sagebrush to decide, then explain how you could independently check the result for a number this small.",
     idea: "A trial-division check needs only primes up to √n. Software can use faster methods for much larger integers.",
-    starter: "# Test whether n is prime\nn = 104729\n\n",
-    hint: "Run <code>is_prime(n)</code>. For a manual check, it is enough to test prime divisors up to floor(√n).",
+    starter: "# Trial-division primality test\nn = 104729\nd = 2\nis_prime_candidate = True\n\n# TODO: test possible divisors while d*d <= n\nwhile TODO:\n    # TODO: if d divides n, mark it composite and stop\n    pass\n    # Otherwise, test the next d\n    pass\n\nis_prime_candidate",
+    hints: ["The loop condition is <code>d*d <= n</code>; using multiplication avoids a square-root call.", "A divisor is found when <code>n % d == 0</code>. Set the flag to False and use <code>break</code>.", "If no divisor is found, increment d. When the loop finishes, the flag is True.", "Compare your result with Sage's <code>is_prime(n)</code> after your own test works."],
     answer: ["true", "yes", "prime"], placeholder: "is it prime?",
     success: "Yes. Sagebrush reports that 104729 is prime.",
     concept: "A computational answer is more useful when you know what kind of test supports it."
@@ -182,10 +190,11 @@ const lessons = [
   {
     id: "prime-search", chapter: 2, title: "Search for the next prime", topic: "PRIME DISTRIBUTION", time: "5 MIN",
     lede: "Primes become less frequent as numbers grow, but there is always another prime after any given bound.",
+    algorithm: { title: "Plan in pseudocode", prompt: "Implement the candidate search. Sage's is_prime is used as the tested building block for this loop.", pseudocode: "candidate ← bound + 1\nwhile candidate is not prime:\n    candidate ← candidate + 1\nreturn candidate" },
     question: "What is the smallest prime greater than one million?",
     idea: "A prime search tests successive candidates. The Prime Number Theorem predicts that near x, a typical gap is about log(x), but it does not predict each gap exactly.",
-    starter: "# Start just above the given bound\nbound = 1_000_000\n\n# Find and verify the next prime\n",
-    hint: "Try <code>next_prime(bound)</code>, then check <code>is_prime</code> and the previous candidate.",
+    starter: "# Search candidates one by one\nbound = 1_000_000\ncandidate = bound + 1\n\n# TODO: keep going while candidate is not prime\nwhile TODO:\n    candidate = TODO\n\ncandidate",
+    hints: ["The condition is <code>not is_prime(candidate)</code>.", "Each loop iteration should increase candidate by one.", "At the end, verify <code>is_prime(candidate)</code> and that candidate is greater than bound.", "Compare with <code>next_prime(bound)</code> after the search loop works."],
     answer: ["1000003", "1,000,003"], placeholder: "next prime = ?",
     success: "Correct: 1,000,003 is prime, and there is no prime between it and 1,000,000.",
     concept: "Search is simple to describe; choosing a reliable primality test makes it practical."
@@ -193,10 +202,11 @@ const lessons = [
   {
     id: "prime-count", chapter: 2, title: "Count primes in a range", topic: "PRIME DISTRIBUTION", time: "5 MIN",
     lede: "The prime-counting function π(x) counts primes up to x. Small experiments help build intuition about how primes thin out.",
+    algorithm: { title: "Plan in pseudocode · sieve of Eratosthenes", prompt: "Build a Boolean table, then cross out multiples starting at each prime's square.", pseudocode: "mark every number from 2 to bound−1 as prime\nfor p from 2 up to bound−1:\n    if p is still marked prime:\n        mark p*p, p*p+p, p*p+2p, ... as composite\ncount the entries still marked prime" },
     question: "How many primes are less than 100? Generate the list in Sagebrush and count its entries.",
     idea: "A finite computation can reveal a pattern, but a proof must explain why it continues beyond the values we checked.",
-    starter: "# Generate primes below 100 and count them\nbound = 100\n\n",
-    hint: "Use <code>prime_range(bound)</code>, then apply <code>len(...)</code>.",
+    starter: "# Sieve of Eratosthenes: count primes below bound\nbound = 100\nis_prime = [True] * bound\nis_prime[0] = is_prime[1] = False\n\n# TODO: for each still-prime p, cross out its multiples from p*p\nfor p in TODO:\n    if is_prime[p]:\n        multiple = TODO\n        while TODO:\n            is_prime[multiple] = False\n            multiple += p\n\nprint(sum(is_prime))",
+    hints: ["Loop over <code>range(2,bound)</code>. It is safe to start crossing out at <code>p*p</code>: smaller multiples already have a smaller prime factor.", "Use <code>while multiple < bound</code> so the final table index stays in range.", "Advance by p each time: <code>multiple += p</code>.", "The Boolean values sum as 1 for True and 0 for False. Compare with <code>len(prime_range(bound))</code>."],
     answer: ["25"], placeholder: "π(100) = ?",
     success: "Yes: there are 25 primes below 100.",
     concept: "Computation suggests patterns; proof tells us which patterns must persist."
@@ -228,10 +238,11 @@ const lessons = [
   {
     id: "unit-group", chapter: 3, title: "Meet the unit group of a finite field", topic: "UNIT GROUPS", time: "6 MIN",
     lede: "Multiplication in a field has an identity and inverses for every nonzero element. Those nonzero elements form a group called the unit group.",
+    algorithm: { title: "Plan in pseudocode", prompt: "Build the set of units by checking each field element. Then count how many you collected.", pseudocode: "units ← empty list\nfor each a in F:\n    if a is not 0:\n        add a to units\nreturn length of units" },
     question: "How many elements are in the unit group of <span class=\"math\">𝔽₁₃</span>? Count the nonzero field elements.",
     idea: "The zero element has no multiplicative inverse, so it is excluded. The remaining 12 elements form 𝔽₁₃ˣ under multiplication modulo 13.",
-    starter: "# Make the field with 13 elements\nF = GF(13)\n\n# List its nonzero elements (the units)\nunits = [a for a in F if a != 0]\nprint(units)\nlen(units)",
-    hint: "A list comprehension collects each <code>a</code> in <code>F</code> for which <code>a != 0</code>. Then <code>len(units)</code> counts the entries.",
+    starter: "# Make the field with 13 elements\nF = GF(13)\nunits = []\n\n# TODO: inspect every element of F\nfor a in TODO:\n    # TODO: add a only when it is nonzero\n    pass\n\nprint(units)\nlen(units)",
+    hints: ["Loop over the field with <code>for a in F:</code>.", "Inside the loop, use <code>if a != 0:</code> to skip zero.", "Add each nonzero element with <code>units.append(a)</code>; then <code>len(units)</code> returns 12."],
     answer: ["12"], placeholder: "size of 𝔽₁₃ˣ = ?",
     success: "Exactly: there are 12 nonzero elements. Under multiplication they form the unit group 𝔽₁₃ˣ.",
     concept: "Unit groups turn invertible elements into a group, a structure that also appears in the points of elliptic curves."
@@ -239,10 +250,11 @@ const lessons = [
   {
     id: "quadratic-residues", chapter: 3, title: "Recognize a quadratic residue", topic: "QUADRATIC RESIDUES", time: "6 MIN",
     lede: "A nonzero residue modulo p is a square if it equals x² for some x. Quadratic residues reveal structure in the field.",
+    algorithm: { title: "Plan in pseudocode", prompt: "Check every possible square root modulo p and stop when one works.", pseudocode: "found ← false\nfor x from 0 through p−1:\n    if x*x mod p equals a:\n        found ← true\n        stop searching\nreturn found" },
     question: "Is <span class=\"math\">5</span> a square modulo <span class=\"math\">23</span>? Use the Legendre symbol to report +1 or −1.",
     idea: "Euler's criterion says a^((p−1)/2) is 1 for a square and −1 for a nonsquare, when p is an odd prime and p does not divide a.",
-    starter: "# Inspect the nonzero squares in F_23, or use Euler's criterion\na, p = 5, 23\n\n",
-    hint: "Try <code>legendre_symbol(a, p)</code>. A result of 1 means square; −1 means nonsquare.",
+    starter: "# Test whether a is a square by checking all possible roots\na, p = 5, 23\nfound = False\n\n# TODO: check each x from 0 through p-1\nfor x in TODO:\n    # TODO: compare x*x modulo p with a\n    pass\n\nfound",
+    hints: ["Use <code>range(p)</code> to test 0 through p−1.", "The square test is <code>(x*x) % p == a</code>.", "When it matches, set <code>found = True</code> and use <code>break</code>.", "Compare the result with <code>legendre_symbol(a,p)</code>; 1 means square and −1 means nonsquare."],
     answer: ["-1", "−1", "nonsquare", "non-square"], placeholder: "Legendre symbol = ?",
     success: "Correct: the symbol is −1, so 5 is not a square modulo 23.",
     concept: "The Legendre symbol compresses a yes/no question about squares into a useful multiplicative function."
@@ -250,10 +262,11 @@ const lessons = [
   {
     id: "multiplicative-order", chapter: 3, title: "Measure a multiplicative cycle", topic: "GROUPS MODULO p", time: "6 MIN",
     lede: "Repeatedly multiply a nonzero residue by itself. Its multiplicative order is the first exponent that returns to 1.",
+    algorithm: { title: "Plan in pseudocode", prompt: "Start at 1 and multiply by a each time. Count how many steps it takes to return to 1.", pseudocode: "value ← 1; order ← 0\nrepeat:\n    value ← value*a mod n\n    order ← order + 1\nuntil value = 1\nreturn order" },
     question: "What is the multiplicative order of <span class=\"math\">2 modulo 13</span>?",
     idea: "The order must divide the group size φ(13) = 12. It records the length of the cycle generated by 2.",
-    starter: "# Create 2 as a residue modulo 13\na = Mod(2, 13)\n\n# Find the first positive exponent that gives 1\n",
-    hint: "Ask Sagebrush for <code>a.multiplicative_order()</code>. You can also list powers until the first 1 appears.",
+    starter: "# Find the order by listing successive powers of 2 modulo 13\na, n = 2, 13\nvalue = 1\norder = 0\n\n# TODO: multiply by a until value returns to 1\nwhile TODO:\n    value = TODO\n    order = TODO\n\norder",
+    hints: ["Use <code>while value != 1 or order == 0</code> so the loop always performs at least one multiplication.", "Update <code>value = (value*a) % n</code>.", "Increase the step count with <code>order += 1</code>.", "Compare with <code>Mod(a,n).multiplicative_order()</code> after your loop returns 12."],
     answer: ["12"], placeholder: "order = ?",
     success: "Yes: the order is 12, so 2 generates every nonzero residue modulo 13.",
     concept: "Elements whose order is p−1 are generators of the multiplicative group."
@@ -261,10 +274,11 @@ const lessons = [
   {
     id: "primitive-root", chapter: 3, title: "Find a generator modulo a prime", topic: "CYCLIC GROUPS", time: "6 MIN",
     lede: "For prime p, the nonzero residues modulo p form a cyclic group. A generator visits every nonzero residue as its powers.",
+    algorithm: { title: "Plan in pseudocode", prompt: "Try candidates in order. A candidate generates the group when its first p−1 powers are all distinct nonzero residues.", pseudocode: "for candidate from 2 through p−1:\n    seen ← empty set; value ← 1\n    repeat p−1 times:\n        add value to seen\n        value ← value*candidate mod p\n    if number of values in seen = p−1:\n        return candidate" },
     question: "Find a primitive root modulo <span class=\"math\">23</span>. Report the smallest positive one.",
     idea: "A generator has order p−1. To test a candidate, its powers must not return to 1 at any proper divisor of p−1.",
-    starter: "# Search for a generator in the nonzero residues modulo 23\np = 23\n\n# Find the smallest primitive root and verify its order\n",
-    hint: "Try <code>primitive_root(p)</code>, then check the candidate's multiplicative order modulo p.",
+    starter: "# Search candidates and count their distinct powers modulo p\np = 23\ngenerator = None\n\n# TODO: try candidate values from 2 through p-1\nfor candidate in TODO:\n    powers = set()\n    value = 1\n    # TODO: collect p-1 successive powers\n    for k in TODO:\n        powers.add(value)\n        value = (value * candidate) % p\n    # TODO: save the first candidate with p-1 distinct powers\n    if TODO:\n        generator = candidate\n        break\n\ngenerator",
+    hints: ["Use <code>range(2,p)</code> for candidates and <code>range(p-1)</code> for each candidate's first p−1 powers.", "A set keeps only distinct values. Add the current value before multiplying by candidate.", "A generator has <code>len(powers) == p-1</code>. Save the candidate and stop at the first match.", "Compare with Sage's <code>primitive_root(p)</code>, then check its <code>multiplicative_order()</code>."],
     answer: ["5"], placeholder: "smallest primitive root = ?",
     success: "Correct: 5 has order 22 modulo 23, so its powers run through every nonzero residue.",
     concept: "Generators turn a multiplicative group into a sequence of powers, a useful model for discrete logarithms."
@@ -378,10 +392,11 @@ const lessons = [
   {
     id: "elliptic-curve", chapter: 6, title: "Meet an elliptic curve over a finite field", topic: "ELLIPTIC CURVES", time: "8 MIN",
     lede: "An elliptic curve is a nonsingular cubic equation together with a special point at infinity. Over a finite field, its points form a finite group.",
+    algorithm: { title: "Plan in pseudocode · count the points", prompt: "Count O first, then check every coordinate pair. This direct method is practical for our tiny field.", pseudocode: "count ← 1  # the point at infinity O\nfor each x in F:\n    for each y in F:\n        if y² = x³ + 2x + 2 in F:\n            count ← count + 1\nreturn count" },
     question: "For <span class=\"math\">E: y² = x³ + 2x + 2</span> over <span class=\"math\">𝔽₁₇</span>, how many points are there, including the point at infinity?",
     idea: "The finite field gives only finitely many coordinate pairs to check. This curve has 18 affine points; adding the point at infinity makes 19.",
-    starter: "# Build y^2 = x^3 + 2*x + 2 over the field with 17 elements\nF = GF(17)\nE = EllipticCurve(F, [2, 2])\n\n# Count all points, including the point at infinity\nE.cardinality()",
-    hint: "The list <code>E.points()</code> includes the point at infinity. Or ask Sage directly for <code>E.cardinality()</code>.",
+    starter: "# Build the field and set up a point counter\nF = GF(17)\nE = EllipticCurve(F, [2, 2])\ncount = 1  # start with the point at infinity O\n\n# TODO: check every pair (x,y) in F x F\nfor x in TODO:\n    for y in TODO:\n        # TODO: when the curve equation holds, count the point\n        pass\n\nprint(count)",
+    hints: ["Use <code>for x in F:</code> and inside it <code>for y in F:</code>.", "The test is <code>y^2 == x^3 + 2*x + 2</code>; Sage field arithmetic automatically reduces modulo 17.", "If the equation holds, increment count. It started at 1 because O has no finite coordinate pair.", "Compare with Sage's <code>E.cardinality()</code> or <code>len(E.points())</code> after the loop works."],
     answer: ["19"], placeholder: "number of points = ?",
     success: "Correct: E has 19 points total—18 affine points and the point at infinity.",
     concept: "Finite-field points give us a finite set on which to do the group operations in the next lesson."
@@ -400,10 +415,11 @@ const lessons = [
   {
     id: "elliptic-order", chapter: 6, title: "Follow repeated point addition", topic: "POINT ORDER", time: "6 MIN",
     lede: "Adding P to itself repeatedly gives P, 2P, 3P, and so on. On a finite curve, this sequence eventually returns to the point at infinity.",
+    algorithm: { title: "Plan in pseudocode", prompt: "Start at O and add P repeatedly. Count the additions until you return to O.", pseudocode: "Q ← O; order ← 0\nrepeat:\n    Q ← Q + P\n    order ← order + 1\nuntil Q = O\nreturn order" },
     question: "What is the smallest positive integer <span class=\"math\">k</span> for which <span class=\"math\">kP</span> is the point at infinity, for <span class=\"math\">P=(5,1)</span>?",
     idea: "The point's order is the first positive k for which kP=O. Here the order is 19, so the nonzero multiples of P run through all 18 affine points before returning to O.",
-    starter: "# Create the finite-field curve and point\nE = EllipticCurve(GF(17), [2, 2])\nP = E(5, 1)\n\n# Find the additive order of P\nP.order()",
-    hint: "Run <code>P.order()</code>. Sage checks repeated addition using the curve's group law.",
+    starter: "# Create the finite-field curve and point\nE = EllipticCurve(GF(17), [2, 2])\nP = E(5, 1)\nO = 0 * P\nQ = O\norder = 0\n\n# TODO: add P repeatedly until Q returns to O\nwhile TODO:\n    Q = TODO\n    order = TODO\n\norder",
+    hints: ["The loop must run once even though Q starts at O. Use <code>while order == 0 or Q != O</code>.", "Inside the loop update <code>Q = Q + P</code>.", "Increase the count with <code>order += 1</code>.", "Compare with Sage's <code>P.order()</code> after your loop returns 19."],
     answer: ["19"], placeholder: "order of P = ?",
     success: "Correct: P has order 19, and 19P is the point at infinity.",
     concept: "Point order describes the cycle generated by repeatedly adding one point."
@@ -422,10 +438,11 @@ const lessons = [
   {
     id: "elliptic-dh", chapter: 6, title: "Build toy elliptic-curve Diffie–Hellman", topic: "KEY AGREEMENT", time: "8 MIN",
     lede: "Two people can combine private integers with public curve points to reach the same shared point without sending their private values.",
+    algorithm: { title: "Plan in pseudocode", prompt: "Complete the public-point and shared-point calculations, then compare both participants' results.", pseudocode: "Alice_public ← Alice_secret * P\nBob_public ← Bob_secret * P\nAlice_shared ← Alice_secret * Bob_public\nBob_shared ← Bob_secret * Alice_public\ncheck Alice_shared = Bob_shared" },
     question: "With base point P=(5,1), Alice chooses 5 and Bob chooses 7. Does computing 5(7P) give the same point as 7(5P)? Enter True or False.",
     idea: "Both calculations equal 35P. Since P has order 19, this is also 16P, the point (10,11). These tiny values are for learning only and provide no security.",
-    starter: "# Create the curve and shared base point\nE = EllipticCurve(GF(17), [2, 2])\nP = E(5, 1)\nalice_secret, bob_secret = 5, 7\n\nalice_public = alice_secret * P\nbob_public = bob_secret * P\nalice_shared = alice_secret * bob_public\nbob_shared = bob_secret * alice_public\n\nprint(alice_shared.xy())\nalice_shared == bob_shared",
-    hint: "Compute the public points with scalar multiplication, then multiply each public point by the other person's private integer. Compare the two shared points with <code>==</code>.",
+    starter: "# Create the curve and shared base point\nE = EllipticCurve(GF(17), [2, 2])\nP = E(5, 1)\nalice_secret, bob_secret = 5, 7\n\n# TODO: compute each public point\nalice_public = TODO\nbob_public = TODO\n# TODO: compute each participant's shared point\nalice_shared = TODO\nbob_shared = TODO\n\nprint(alice_shared.xy())\nalice_shared == bob_shared",
+    hints: ["A public point is the participant's secret multiplied by P.", "Alice multiplies Bob's public point by her secret; Bob multiplies Alice's public point by his secret.", "The two results are equal because both equal (5*7)P. Confirm with <code>==</code>.", "For this toy curve the shared point is (10,11); small parameters provide no security."],
     answer: ["true", "yes"], placeholder: "Do the shared points match? (True/False)",
     success: "True. Both sides get 35P=(10,11). A real protocol uses large parameters and additional safeguards.",
     concept: "This is the basic idea behind elliptic-curve key agreement; the toy example makes the arithmetic visible."
@@ -439,7 +456,7 @@ const lessonSupport = {
     definitions: [
       ["Divides", "An integer d divides n if n = d*k for some integer k. We write d | n; for example, 18 | 252 because 252 = 18*14."],
       ["Greatest common divisor gcd(a,b)", "The largest positive integer that divides both a and b. It is the greatest shared factor; gcd(252,198)=18."],
-      ["Remainder", "The value left after integer division. For example, 252 % 198 = 54. The Euclidean algorithm repeatedly replaces (a,b) by (b, a % b)."]
+      ["Remainder", "The value left after integer division. For example, 252 % 198 = 54. The lesson will use remainders to build a loop that finds a gcd."]
     ],
     tools: [
       ["gcd(a, b)", "Sage's greatest-common-divisor function. It returns the largest positive integer dividing both inputs; for gcd(252,198), it returns 18."],
@@ -450,7 +467,7 @@ const lessonSupport = {
       title: "Euclidean algorithm: each remainder gets smaller",
       caption: "The divisions end at remainder 0; the last nonzero remainder, 18, is the gcd.",
       svg: `<svg viewBox="0 0 560 110" role="img" aria-label="Euclidean algorithm steps ending with gcd 18"><g font-family="monospace" font-size="11" fill="#435448"><rect x="8" y="20" width="118" height="58" rx="7" fill="#eef3eb" stroke="#d5e0d3"/><rect x="148" y="20" width="118" height="58" rx="7" fill="#eef3eb" stroke="#d5e0d3"/><rect x="288" y="20" width="118" height="58" rx="7" fill="#eef3eb" stroke="#d5e0d3"/><rect x="428" y="20" width="118" height="58" rx="7" fill="#e5f0e3" stroke="#b9d0bc"/><text x="67" y="43" text-anchor="middle">252 = 1·198</text><text x="67" y="62" text-anchor="middle">+ 54</text><text x="207" y="43" text-anchor="middle">198 = 3·54</text><text x="207" y="62" text-anchor="middle">+ 36</text><text x="347" y="43" text-anchor="middle">54 = 1·36</text><text x="347" y="62" text-anchor="middle">+ 18</text><text x="487" y="43" text-anchor="middle">36 = 2·18</text><text x="487" y="62" text-anchor="middle">+ 0</text></g><path d="M128 49h16m-5-5 5 5-5 5M268 49h16m-5-5 5 5-5 5M408 49h16m-5-5 5 5-5 5" fill="none" stroke="#829384" stroke-width="1.5"/><text x="280" y="101" text-anchor="middle" fill="#285b43" font-family="monospace" font-size="11">last nonzero remainder = gcd(252, 198) = 18</text></svg>`,
-      source: "a, b = 252, 198\nwhile b != 0:\n    a, b = b, a % b\nprint(a)  # 18"
+      source: "division_facts = [(252, 198), (198, 54), (54, 36), (36, 18)]\nfor dividend, divisor in division_facts:\n    print(dividend // divisor, dividend % divisor)"
     }
   },
   bezout: {
@@ -909,6 +926,187 @@ const lessonSupport = {
   }
 };
 
+for (const lesson of lessons) {
+  if (!lesson.algorithm) continue;
+  lessonSupport[lesson.id].definitions.unshift([
+    "Pseudocode",
+    "A language-independent outline of an algorithm. It describes the steps without requiring exact Sage or Python syntax; the left arrow means ‘assign this value.’"
+  ]);
+  lessonSupport[lesson.id].tools.unshift([
+    "TODO",
+    "A visible placeholder in the starter code. It is not a Sage command: replace it with the condition or expression asked for in the comment before running the cell."
+  ]);
+}
+lessonSupport.gcd.tools.push(
+  ["while condition:", "Repeats the indented body as long as condition is True. The loop ends when b becomes 0."],
+  ["pass", "A no-operation placeholder. Replace it with the statements that make the loop work."],
+  ["r = a % b", "Computes the remainder and saves it in r before a and b are updated."],
+  ["a = b", "Assignment changes the value stored in a. The right side is evaluated first."]
+);
+lessonSupport.bezout.tools.push(
+  ["//", "Integer division: a // b returns the whole-number quotient and discards the remainder."],
+  ["old_r, r = r, old_r - q*r", "Simultaneous assignment. Sage evaluates both right-side expressions using the old values, then updates both variables."],
+  ["old_s, s = s, old_s - q*s", "Updates the coefficients that track how the current remainders are built from the original a."],
+  ["while r != 0:", "Repeats the Euclidean steps until the current remainder r reaches zero."]
+);
+lessonSupport["factor-small"].tools.push(
+  ["while condition:", "Repeats a block while the condition is True. Here the trial divisor only needs testing while d*d <= remaining."],
+  ["remaining % d == 0", "Checks whether d divides remaining by testing whether the remainder is zero."],
+  ["factors.append(d)", "Adds d to the end of the list named factors."],
+  ["remaining // d", "Divides out one copy of d using integer division; use this only after confirming d divides remaining."],
+  ["d += 1", "Increases the trial divisor by one, the same as d = d + 1."]
+);
+lessonSupport.totient.tools.push(
+  ["gcd(k,n)", "Calls the gcd function taught earlier to test whether k and n share any factor greater than 1."],
+  ["gcd(k,n) == 1", "Returns True exactly when k is coprime to n, so that integer should be counted."],
+  ["range(1, n+1)", "Creates the integers 1 through n. The stop value n+1 is excluded by range, so n is included."],
+  ["for k in TODO:", "Runs the indented block once for each value produced by the sequence after in."],
+  ["count += 1", "Adds one to the current count, the same as count = count + 1."],
+  ["pass", "A no-operation placeholder. Replace it with the conditional counting code."]
+);
+lessonSupport.remainders.tools.push(
+  ["def mod_exp(a, exponent, modulus):", "Defines a reusable function with three inputs: base, exponent, and modulus. The indented lines are its body."],
+  ["%", "Remainder operator. Reducing after multiplication keeps each intermediate value smaller than the modulus."],
+  ["//", "Integer division. Dividing the exponent by 2 this way discards any fractional part."],
+  ["return result", "Ends the function and sends result back to the line that called the function."],
+  ["exponent % 2 == 1", "Tests whether exponent is odd. The remainder after division by 2 is 1 exactly for odd integers."],
+  ["pass", "A no-operation placeholder. Replace each one with a step from the pseudocode."]
+);
+lessonSupport.inverse.tools.push(
+  ["range(1, n)", "Produces the candidate residues 1 through n−1; n itself represents zero modulo n."],
+  ["break", "Immediately exits the nearest loop after an inverse is found."],
+  ["u = None", "Initializes u to a special value meaning ‘no candidate found yet.’"],
+  ["if condition:", "Runs the indented block only when the condition is True."],
+  ["pass", "A no-operation placeholder to replace with the inverse check and assignment."]
+);
+lessonSupport.crt.tools.push(
+  ["range(period)", "Produces every integer from 0 to period−1, one representative of each residue modulo period."],
+  ["and", "Combines two conditions; both must be True for the combined condition to be True."],
+  ["solution = x", "Saves the first candidate satisfying both congruences."],
+  ["break", "Stops the search after the first matching x is found."],
+  ["pass", "A no-operation placeholder to replace with the two remainder tests."]
+);
+  lessonSupport.primality.tools.push(
+  ["while d*d <= n:", "Continues trial division only while the candidate divisor is at most the square root of n, written without a square-root operation."],
+  ["break", "Exits a loop immediately when a divisor is found."],
+  ["pass", "A no-operation placeholder. Replace it with the divisor test or increment."]
+);
+lessonSupport["prime-search"].tools.push(
+  ["while condition:", "Repeats the loop body while condition is True."],
+  ["candidate += 1", "Advances to the next integer candidate, the same as candidate = candidate + 1."],
+  ["not is_prime(candidate)", "The not operator reverses a Boolean value, so the search continues while the candidate is composite." ]
+);
+lessonSupport["prime-count"].tools.push(
+  ["[True] * bound", "Creates a list with bound copies of True, one Boolean slot for each index from 0 to bound−1."],
+  ["is_prime[0] = is_prime[1] = False", "Sets the entries for 0 and 1 to False because neither number is prime."],
+  ["range(2, bound)", "Visits candidate prime indices 2 through bound−1."],
+  ["multiple = p*p", "Starts crossing out at p squared because all smaller multiples of p already have a smaller prime factor."],
+  ["while multiple < bound:", "Keeps crossing out multiples while their list index remains below the bound."],
+  ["multiple += p", "Moves from one multiple of p to the next by adding p."],
+  ["is_prime[p]", "Reads the Boolean table entry at index p; True means p has not been crossed out."],
+  ["set a list entry by index", "The assignment is_prime[multiple] = False crosses that number out in the sieve table."],
+  ["sum(is_prime)", "Adds the Boolean values, treating True as 1 and False as 0, to count the entries still marked prime." ]
+);
+lessonSupport["multiplicative-order"].tools.push(
+  ["value = (value*a) % n", "Multiplies by a and reduces modulo n to move to the next power."],
+  ["order += 1", "Increases the exponent counter by one after each multiplication."],
+  ["while value != 1 or order == 0:", "The or condition ensures at least one power is computed, even though the initial value is already 1."],
+  ["value != 1", "The loop continues while the current power is different from the multiplicative identity 1."],
+  ["or", "The condition on its left or its right may be True; if either is True, the combined condition is True."],
+  ["pass", "A no-operation placeholder to replace with the multiplication and counter updates."]
+);
+lessonSupport["primitive-root"].tools.push(
+  ["set()", "Creates an empty set, a collection that stores each value only once."],
+  ["powers.add(value)", "Adds the current residue to the set of powers."],
+  ["range(2, p)", "Produces candidate generators 2 through p−1."],
+  ["len(powers) == p-1", "Tests whether the candidate produced all p−1 nonzero residues without repetition."],
+  ["break", "Stops after the first generator is found; candidates are tested in increasing order."]
+);
+lessonSupport["unit-group"].tools = [
+  ["TODO", "A visible placeholder in the starter code. It is not a Sage command; replace it with the condition or expression described in the comment."],
+  ["GF(13)", "Creates the finite field with 13 elements and assigns it to F. Its elements can be represented by residues 0 through 12."],
+  ["for a in F:", "Loops through each element of the finite field F, assigning the current element to a."],
+  ["if a != 0:", "Runs its indented body only for nonzero a. Every nonzero field element has a multiplicative inverse."],
+  ["units.append(a)", "Adds the element a to the end of the list named units."],
+  ["print(units)", "Displays the list of nonzero elements so you can inspect the set you constructed."],
+  ["len(units)", "Returns the number of entries in the list. Here it counts the 12 elements of F₁₃ˣ."]
+];
+lessonSupport["quadratic-residues"].tools.push(
+  ["range(p)", "Produces the integers 0 through p−1, all possible residue representatives to test as square roots."],
+  ["(x*x) % p == a", "Squares x, reduces the result modulo p, and tests whether it equals a."],
+  ["found = True", "Stores the Boolean result that a square root has been found."],
+  ["break", "Stops checking further x values after finding a square root."],
+  ["pass", "A no-operation placeholder to replace with the square-root test."]
+);
+lessonSupport["elliptic-curve"].tools.push(
+  ["for x in F:", "Loops over all 17 field elements as possible x-coordinates."],
+  ["for y in F:", "Loops over all field elements as possible y-coordinates for each x."],
+  ["y^2 == x^3 + 2*x + 2", "Tests the curve equation in the finite field. Sage reduces both sides modulo 17."],
+  ["if condition:", "Runs the indented body only when the condition evaluates to True."],
+  ["count += 1", "Counts one point when a coordinate pair satisfies the equation. Initialize count to 1 first to include O." ]
+);
+lessonSupport["elliptic-order"].tools.push(
+  ["0*P", "The zero scalar multiple is the identity point O on the curve."],
+  ["Q + P", "Adds P once to the current point Q."],
+  ["Q != O", "Tests whether Q differs from the identity point O."],
+  ["order == 0 or Q != O", "Makes the loop run at least once, then continue as long as Q has not returned to the identity."],
+  ["order += 1", "Counts one point addition." ]
+);
+lessonSupport["elliptic-dh"].tools.push(
+  ["alice_secret * P", "Computes Alice's public point from her private scalar and the shared base point."],
+  ["bob_secret * P", "Computes Bob's public point from his private scalar and the shared base point."],
+  ["alice_secret * bob_public", "Computes the shared point on Alice's side by multiplying Bob's public point by Alice's secret."],
+  ["bob_secret * alice_public", "Computes the same shared point on Bob's side using his secret and Alice's public point."]
+);
+lessonSupport["factor-small"].definitions.push(
+  ["Trial division", "To factor n, try small divisors in order. Record each divisor that divides the current remainder, divide it out, and stop once d*d is larger than the remaining value."],
+  ["Prime factor list", "A list in which each prime factor appears once for each copy in the factorization. For 8051 the result is [83, 97]."]
+);
+lessonSupport.remainders.definitions.push(
+  ["Square-and-multiply", "An efficient way to compute a^e modulo m: use the parity of e, square the base, halve e, and reduce after every multiplication."]
+);
+lessonSupport.inverse.definitions.push(
+  ["Brute-force search", "A simple algorithm that checks each candidate in a finite set until it finds one that works or runs out of candidates."]
+);
+lessonSupport.crt.definitions.push(
+  ["Exhaustive search", "Checking every possible candidate in a finite range. Here one full period m*n contains a representative of every combined residue class."]
+);
+lessonSupport["prime-count"].definitions.push(
+  ["Sieve of Eratosthenes", "A method for listing primes below a bound: begin by marking numbers as possible primes, then cross out multiples of each prime starting at its square."],
+  ["Boolean table", "A list of True/False values. In this sieve, True means the index has not yet been crossed out as composite."]
+);
+lessonSupport["prime-search"].definitions.push(
+  ["Candidate", "A value being tested as a possible answer. The search checks consecutive integers above the supplied bound."],
+  ["Search loop", "A loop that checks candidates and updates them until a stopping condition is met."]
+);
+lessonSupport["multiplicative-order"].definitions.push(
+  ["Multiplicative order", "The smallest positive exponent k for which a^k is congruent to 1 modulo n. Repeated multiplication finds it when a is invertible modulo n."]
+);
+lessonSupport["primitive-root"].definitions.push(
+  ["Distinct powers", "Powers counted without repetition. A candidate is a generator modulo prime p if its first p−1 powers give all p−1 nonzero residues."],
+  ["Set", "An unordered collection in which each value appears at most once; it is useful for counting distinct powers."]
+);
+lessonSupport["elliptic-curve"].definitions.push(
+  ["Point-counting algorithm", "To count points over a small finite field, check each coordinate pair in the field and add one for every pair satisfying the curve equation. Include O separately."]
+);
+lessonSupport.primality.definitions.push(
+  ["Boolean flag", "A variable holding True or False. The trial-division loop changes it to False when a divisor is found."]
+);
+lessonSupport.gcd.definitions.push(
+  ["Loop", "A block of code that repeats. A while loop repeats as long as its condition is True."]
+);
+for (const id of ["factor-small", "totient", "unit-group", "quadratic-residues", "elliptic-curve"]) {
+  lessonSupport[id].tools.push(["pass", "A no-operation placeholder. Replace it with the code described in the surrounding TODO comment."]);
+}
+lessonSupport.totient.tools.push(["if condition:", "Runs the indented block only when the condition evaluates to True."]);
+lessonSupport["factor-small"].tools.push(
+  ["if condition:", "Runs the indented block only when the condition is True."],
+  ["else:", "Runs when the preceding if condition is False."],
+  ["break", "Exits the current loop immediately." ]
+);
+lessonSupport.primality.tools.push(["n % d == 0", "Checks whether d divides n by testing whether the remainder is zero."]);
+lessonSupport["primitive-root"].tools.push(["if len(powers) == p-1:", "Checks that all p−1 nonzero residues have appeared as distinct powers." ]);
+
 // The visual panels are drawn as inline SVG, so the site needs no image host.
 // Their underlying values are regenerated by the Sage/Python snippets shown.
 lessonSupport.primality.visual = {
@@ -977,7 +1175,11 @@ async function mountNotebook(lesson, host, generation) {
       { id: cellId(), code: lesson.starter }
     ];
     kernel.start();
-    await notebook.attach(new IdbStore(db, `fieldnotes-${lesson.id}`, { name: lesson.title, mode: "sage", cells }));
+    // The pseudocode exercises use a fresh notebook record so an older saved
+    // full-solution starter does not hide the new learner-written scaffold.
+    // Earlier records remain in IndexedDB and are not deleted.
+    const notebookId = `fieldnotes-${lesson.id}${lesson.algorithm ? "-guided" : ""}`;
+    await notebook.attach(new IdbStore(db, notebookId, { name: lesson.title, mode: "sage", cells }));
     if (generation !== notebookGeneration) {
       notebook.destroy();
       kernel.close();
@@ -1041,6 +1243,9 @@ function render() {
   const chapterIntro = firstInChapter ? `<div class="chapter-intro"><b>CHAPTER ${String(lesson.chapter + 1).padStart(2, "0")} · ${chapter.title}</b><p>${chapter.overview}</p><span>${chapter.goals}</span></div>` : "";
   const definitionBox = `<section class="learning-box definition-box" aria-label="New definitions"><h3><span class="learning-box-icon">D</span>New definitions</h3><dl>${support.definitions.map(([term, definition]) => `<div><dt>${escapeHtml(term)}</dt><dd>${escapeHtml(definition)}</dd></div>`).join("")}</dl></section>`;
   const toolBox = `<section class="learning-box tool-box" aria-label="New Sagebrush code tools"><h3><span class="learning-box-icon">{ }</span>New code tools · Sage mode</h3><dl>${support.tools.map(([name, description]) => `<div><dt><code>${escapeHtml(name)}</code></dt><dd>${escapeHtml(description)}</dd></div>`).join("")}</dl><p class="tool-note">Sage mode accepts Python-style assignment, loops, and lists. Sage's <code>^</code> means exponentiation; in regular Python use <code>**</code>.</p></section>`;
+  const algorithmBox = lesson.algorithm ? `<section class="algorithm-box" aria-label="Algorithm pseudocode"><h3><span class="learning-box-icon">→</span>${escapeHtml(lesson.algorithm.title)}</h3><p>${escapeHtml(lesson.algorithm.prompt)}</p><pre><code>${escapeHtml(lesson.algorithm.pseudocode)}</code></pre><p class="algorithm-note">The starter code marks unfinished lines with <code>TODO</code>. Replace those markers before running it.</p></section>` : "";
+  const hintContent = lesson.hints ? `<ol>${lesson.hints.map(hint => `<li>${hint}</li>`).join("")}</ol>` : `<p>${lesson.hint}</p>`;
+  const hintBox = `<details class="work-hint"><summary>Need a nudge?</summary>${hintContent}</details>`;
   const proofPrompt = lesson.proof ? `<details class="proof-prompt"><summary>Try a short proof</summary><p>${escapeHtml(lesson.proof)}</p></details>` : "";
   const visual = support.visual ? `<figure class="math-visual"><figcaption><strong>${escapeHtml(support.visual.title)}</strong><span>${escapeHtml(support.visual.caption)}</span></figcaption>${support.visual.svg}<details><summary>Recreate the figure's data with Sage/Python</summary><pre><code>${escapeHtml(support.visual.source)}</code></pre></details></figure>` : "";
   const nextPaths = current === lessons.length - 1 ? `<section class="next-paths"><h3>Where to go next</h3><p>This course gives you a starting point in each area. These are natural continuations:</p><ul><li><b>Elementary number theory:</b> quadratic reciprocity → modular square roots → Pell equations → continued fractions.</li><li><b>Computational number theory and cryptography:</b> Miller–Rabin primality testing → discrete logarithms → Diffie–Hellman and ElGamal → stronger factoring methods.</li><li><b>Algebraic number theory:</b> norms and rings of integers → ideals and ideal factorization → class groups and units → prime splitting in general number fields.</li><li><b>Elliptic curves:</b> curves over extension fields → faster point counting → isogenies → cryptographic implementation and security.</li></ul></section>` : "";
@@ -1050,6 +1255,7 @@ function render() {
     ${chapterIntro}
     ${definitionBox}
     <p class="module-lede">${lesson.lede}</p>
+    ${algorithmBox}
     <div class="question-card"><span class="question-symbol">?</span><div><p class="question-label">YOUR PROBLEM</p><p>${lesson.question}</p></div></div>
     <p class="idea-row"><span class="bulb">✳</span><span><b>The idea.</b> ${lesson.idea}</span></p>
     ${proofPrompt}
@@ -1059,7 +1265,7 @@ function render() {
       <div class="notebook-host" id="sagebrush-notebook" aria-label="Sagebrush Sage notebook"><p class="notebook-loading" role="status">Starting Sagebrush…</p></div>
       <p class="notebook-caption">This editable Sagebrush notebook runs in your browser. Change the starter code and press <kbd>Shift</kbd> + <kbd>Enter</kbd> to run it.</p>
     </section>
-    <details class="work-hint"><summary>Need a nudge?</summary><p>${lesson.hint}</p></details>
+    ${hintBox}
     <div class="answer-block"><p class="answer-title">BRING YOUR RESULT BACK HERE</p><form class="answer-form" id="answer-form"><input class="answer-input" id="answer-input" autocomplete="off" spellcheck="false" aria-label="Your answer" placeholder="${lesson.placeholder}" ${solved ? "disabled" : ""}><button class="check-button" type="submit" ${solved ? "disabled" : ""}>${solved ? "Solved ✓" : "Check answer"}</button></form><p class="answer-feedback ${solved ? "good" : ""}" id="answer-feedback" aria-live="polite">${solved ? lesson.success : "Use the Sagebrush notebook to work it out, then enter your result."}</p></div>
     ${nextPaths}
     <div class="lesson-bottom"><span class="lesson-bottom-note">${lesson.concept}</span>${current > 0 ? `<button class="prev-button" id="prev-button" type="button">← Previous</button>` : ""}<button class="next-button ${solved && current < lessons.length - 1 ? "show" : ""}" id="next-button" type="button">${current === lessons.length - 1 ? "Curriculum complete" : "Next lesson"}<span>→</span></button></div>`;
