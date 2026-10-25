@@ -42,6 +42,7 @@ const lessons = [
     hint: "Try <code>gcd(a, b)</code>. To see the Euclidean algorithm at work, inspect <code>a % b</code>, then repeat with the smaller pair.",
     answer: ["18"], placeholder: "gcd(252, 198) = ?",
     success: "Correct: 18 divides both 252 and 198, and no larger positive integer does.",
+    proof: "Why does replacing (a, b) by (b, a mod b) preserve the common divisors? Use that fact to explain why the Euclidean algorithm returns the gcd.",
     concept: "Divisibility gives us a way to compare integers before we factor them."
   },
   {
@@ -53,6 +54,7 @@ const lessons = [
     hint: "Run <code>xgcd(a, b)</code>. Sage returns (g, u, v), then verify <code>a*u + b*v == g</code>.",
     answer: ["4"], placeholder: "coefficient u = ?",
     success: "Yes. One identity is 252·4 + 198·(−5) = 18.",
+    proof: "Starting from the Euclidean algorithm's remainder equations, explain how working backward writes the final nonzero remainder as an integer combination of the original inputs.",
     concept: "The same algorithm that proves a gcd will later make division modulo n possible."
   },
   {
@@ -75,6 +77,7 @@ const lessons = [
     hint: "Try <code>factor(n)</code>. The answer is a product of prime powers; multiply the factors back together as a check.",
     answer: ["83*97", "83 97", "83,97", "97*83", "97 83", "97,83"], placeholder: "prime factors of 8051",
     success: "Exactly: 8051 = 83 × 97, with both factors prime.",
+    proof: "Suppose an integer has two prime factorizations. Use Euclid's lemma (if a prime divides a product, it divides one factor) to show one prime in the first factorization must match a prime in the second. What can you cancel, and how do you finish by induction?",
     concept: "Prime factorization describes an integer as a product of primes and supplies the data for many arithmetic calculations."
   },
   {
@@ -107,20 +110,21 @@ const lessons = [
     starter: "# Factor 360, then count the residues coprime to it\nn = 360\n\n",
     hint: "Compare a direct count with Sage's <code>euler_phi(n)</code>. What does the prime factorization tell you about the formula?",
     answer: ["96"], placeholder: "φ(360) = ?",
-    success: "Right: φ(360) = 96. Exactly 96 residue classes have multiplicative inverses modulo 360.",
-    concept: "The totient counts exactly the residue classes modulo n that have a multiplicative inverse."
+    success: "Right: φ(360) = 96. This lesson counts the residue classes represented by integers coprime to 360.",
+    proof: "For distinct primes p and q, count the numbers from 1 through pq that are not divisible by p or q. Use inclusion-exclusion to derive φ(pq)=(p−1)(q−1).",
+    concept: "The connection between coprime residues and modular inverses will be made explicitly in Chapter 2."
   },
 
   // Chapter 2 · Congruences
   {
     id: "remainders", chapter: 1, title: "Compute with remainders", topic: "RESIDUE CLASSES", time: "5 MIN",
     lede: "Two integers are congruent modulo m when they have the same remainder after division by m.",
-    question: "Find the remainder when <span class=\"math\">37¹⁰⁰</span> is divided by <span class=\"math\">101</span>.",
-    idea: "There are only 101 possible remainders modulo 101. Repeated multiplication must eventually cycle, so a huge power can have a small answer.",
+    question: "Find the remainder when <span class=\"math\">37¹⁰⁰</span> is divided by <span class=\"math\">101</span>. Before calculating, guess whether repeated powers cycle.",
+    idea: "There are only 101 possible remainders modulo 101. Repeated multiplication must eventually cycle, so a huge power can have a small answer. This example is meant to reveal a pattern; a later lesson explains why this particular power is 1.",
     starter: "# Compute the remainder without constructing the huge power\na, exponent, modulus = 37, 100, 101\n\n",
     hint: "Use <code>power_mod(a, exponent, modulus)</code>. Compare it with <code> (a^exponent) % modulus</code> for this small example.",
     answer: ["1"], placeholder: "remainder = ?",
-    success: "Correct: the remainder is 1. In fact, 101 is prime and 37 is nonzero modulo 101, so Fermat's theorem predicts this.",
+    success: "Correct: the remainder is 1. A later lesson in this chapter explains why this power returns 1, using Fermat's little theorem.",
     concept: "Congruence lets us replace an enormous integer with a small residue without losing the modular result."
   },
   {
@@ -132,6 +136,7 @@ const lessons = [
     hint: "Try <code>inverse_mod(a, n)</code>, then verify <code>(a*u) % n</code> is 1.",
     answer: ["2753"], placeholder: "inverse = ?",
     success: "Exactly: 17 × 2753 = 46801 = 1 + 15 × 3120.",
+    proof: "Show both directions: if au ≡ 1 (mod n), then any common divisor of a and n divides 1; conversely, if gcd(a,n)=1, Bézout's identity gives an inverse modulo n.",
     concept: "The inverse exists because 17 and 3120 are coprime. This is the key operation in RSA."
   },
   {
@@ -154,6 +159,7 @@ const lessons = [
     hint: "Try <code>crt(a, b, m, n)</code>. Sage returns a representative of the shared residue class.",
     answer: ["11", "11mod72", "11(mod72)"], placeholder: "least positive x",
     success: "Correct: 11 leaves remainders 2 and 3. All solutions are 11 modulo 72.",
+    proof: "If x and y both solve the two congruences, show that x−y is divisible by both coprime moduli 8 and 9. Why must it then be divisible by 72?",
     concept: "The coprime moduli make the combined period the product 9·8 = 72."
   },
 
@@ -308,6 +314,18 @@ const lessons = [
     concept: "Discriminants are the arithmetic fingerprint used to study primes and ideal classes."
   },
   {
+    id: "factorization-bridge", chapter: 5, title: "See unique factorization fail", topic: "ELEMENT FACTORIZATION", time: "7 MIN",
+    lede: "A new number system can change how factorization works. In the ring ℤ[√−5], the same number has two genuinely different factorizations.",
+    question: "Use Sagebrush to verify that <span class=\"math\">6 = 2·3 = (1+√−5)(1−√−5)</span>. Enter True or False, then explain why these are different factorizations rather than reordered factors.",
+    idea: "The norm N(a+b√−5)=a²+5b² is multiplicative. It helps show 2, 3, and 1±√−5 are irreducible; the only units are ±1, so the factors are not associates. Ideals will recover a form of unique factorization in the next lesson.",
+    starter: "# Work in the quadratic ring Z[sqrt(-5)]\nK = QuadraticField(-5)\ns = K.gen()\n\nleft = K(2) * K(3)\nright = (1 + s) * (1 - s)\nprint(left)\nprint(right)\nprint(left == right)",
+    hint: "In Sage, <code>K.gen()</code> returns the generator s satisfying s² = −5. Check the two products directly. For the conceptual part, compare the factors up to multiplication by the units ±1.",
+    answer: ["true", "yes", "equal"], placeholder: "Do the products agree? (True/False)",
+    success: "True: both products equal 6. The norm argument in the proof prompt shows the factors are irreducible; they are not associates, so the factorizations are genuinely different.",
+    concept: "This concrete failure of unique factorization motivates ideals and the class group.",
+    proof: "Use N(a+b√−5)=a²+5b². Explain why an element of norm 2 or 3 cannot exist, and use multiplicativity of the norm to rule out nontrivial factorizations of 2, 3, and 1±√−5."
+  },
+  {
     id: "class-number", chapter: 5, title: "Count ideal classes", topic: "CLASS GROUPS", time: "7 MIN",
     lede: "In some number fields, elements do not factor uniquely into irreducibles. Ideals still factor uniquely; the class group measures the gap.",
     question: "What is the class number of <span class=\"math\">ℚ(√−23)</span>?",
@@ -391,6 +409,8 @@ const lessonSupport = {
       ["Prime", "A positive integer greater than 1 whose only positive divisors are 1 and itself."],
       ["Prime factorization", "Writing an integer as a product of primes, with each prime appearing the number of times indicated by its exponent. For example, 12 = 2^2 * 3."],
       ["Exponent", "In p^e, the exponent e says how many copies of p occur in the product."],
+      ["Euclid's lemma", "If a prime divides a product ab, then it divides a or b. This key fact is used to prove that prime factorization is unique."],
+      ["Mathematical induction", "A proof method for statements about positive integers: prove a starting case, then prove each case follows from the preceding one."],
       ["Fundamental Theorem of Arithmetic", "Every integer greater than 1 has a prime factorization, and that factorization is unique apart from reordering the factors."]
     ],
     tools: [
@@ -429,7 +449,7 @@ const lessonSupport = {
       ["Coprime", "Two integers are coprime (or relatively prime) when their greatest common divisor is 1."],
       ["Residue class modulo n", "All integers that have the same remainder after division by n. For instance, 1, 361, and -359 are in the same class modulo 360."],
       ["Multiplicative inverse modulo n", "For a residue a, an inverse is a residue u such that a*u ≡ 1 (mod n). It exists exactly when gcd(a,n)=1."],
-      ["Euler's totient φ(n)", "The number of residue classes modulo n that have a multiplicative inverse. Equivalently, it counts integers from 1 through n that are coprime to n."]
+      ["Euler's totient φ(n)", "The number of residue classes modulo n represented by integers coprime to n. Preview: these are exactly the classes with multiplicative inverses; Chapter 2 proves that connection."]
     ],
     tools: [
       ["euler_phi(n)", "Returns Euler's totient φ(n). For n = 360 it returns 96."],
@@ -694,6 +714,21 @@ const lessonSupport = {
       ["QuadraticField(-23)", "Constructs the example field used in this lesson. K is simply a variable name holding that field."]
     ]
   },
+  "factorization-bridge": {
+    definitions: [
+      ["Quadratic ring ℤ[√−5]", "The numbers a+b√−5 with integers a and b, using (√−5)^2 = −5. This is the ring of integers of ℚ(√−5)."],
+      ["Norm", "For a+b√−5, its norm is N(a+b√−5)=a²+5b². The norm is a nonnegative integer and satisfies N(xy)=N(x)N(y)."],
+      ["Unit", "An element with a multiplicative inverse in the same ring. In ℤ[√−5], the only units are 1 and −1."],
+      ["Irreducible", "A nonzero nonunit that cannot be written as a product of two nonunits."],
+      ["Associates", "Two elements that differ by multiplication by a unit. Reordering factors or replacing a factor by an associate does not count as a different factorization."]
+    ],
+    tools: [
+      ["QuadraticField(-5)", "Constructs the field ℚ(√−5). Assigning it to K lets you use its generator and arithmetic."],
+      ["K.gen()", "Returns the generator s of the quadratic field K, with s² = −5."],
+      ["K(2)", "Converts the integer 2 into an element of K so it can be multiplied by other field elements."],
+      ["==", "Tests whether two expressions have exactly the same value. Here it checks that 2·3 and (1+s)(1−s) both equal 6."]
+    ]
+  },
   "compare-classes": {
     definitions: [
       ["Unit", "An element with a multiplicative inverse in the same ring."],
@@ -849,7 +884,9 @@ function render() {
   const chapterIntro = firstInChapter ? `<div class="chapter-intro"><b>CHAPTER ${String(lesson.chapter + 1).padStart(2, "0")} · ${chapter.title}</b><p>${chapter.overview}</p><span>${chapter.goals}</span></div>` : "";
   const definitionBox = `<section class="learning-box definition-box" aria-label="New definitions"><h3><span class="learning-box-icon">D</span>New definitions</h3><dl>${support.definitions.map(([term, definition]) => `<div><dt>${escapeHtml(term)}</dt><dd>${escapeHtml(definition)}</dd></div>`).join("")}</dl></section>`;
   const toolBox = `<section class="learning-box tool-box" aria-label="New Sagebrush code tools"><h3><span class="learning-box-icon">{ }</span>New code tools · Sage mode</h3><dl>${support.tools.map(([name, description]) => `<div><dt><code>${escapeHtml(name)}</code></dt><dd>${escapeHtml(description)}</dd></div>`).join("")}</dl><p class="tool-note">Sage mode accepts Python-style assignment, loops, and lists. Sage's <code>^</code> means exponentiation; in regular Python use <code>**</code>.</p></section>`;
+  const proofPrompt = lesson.proof ? `<details class="proof-prompt"><summary>Try a short proof</summary><p>${escapeHtml(lesson.proof)}</p></details>` : "";
   const visual = support.visual ? `<figure class="math-visual"><figcaption><strong>${escapeHtml(support.visual.title)}</strong><span>${escapeHtml(support.visual.caption)}</span></figcaption>${support.visual.svg}<details><summary>Recreate the figure's data with Sage/Python</summary><pre><code>${escapeHtml(support.visual.source)}</code></pre></details></figure>` : "";
+  const nextPaths = current === lessons.length - 1 ? `<section class="next-paths"><h3>Where to go next</h3><p>This course gives you a starting point in each area. These are natural continuations:</p><ul><li><b>Elementary number theory:</b> quadratic reciprocity → modular square roots → Pell equations → continued fractions.</li><li><b>Computational number theory and cryptography:</b> Miller–Rabin primality testing → discrete logarithms → Diffie–Hellman and ElGamal → stronger factoring methods.</li><li><b>Algebraic number theory:</b> norms and rings of integers → ideals and ideal factorization → class groups and units → prime splitting in general number fields.</li><li><b>Elliptic curves:</b> finite fields and groups → curve equations and point addition → point counting → elliptic-curve discrete logarithms and cryptography. Elliptic curves are not covered in this course.</li></ul></section>` : "";
   panel.innerHTML = `
     <div class="module-meta"><span class="module-tag">${lesson.topic}</span><span>CH ${String(lesson.chapter + 1).padStart(2, "0")} · LESSON ${chapterLesson} / ${chapterLessons}</span><span>·</span><span>${lesson.time}</span></div>
     <div class="module-heading"><h2>${lesson.title}</h2><span class="solved-stamp ${solved ? "show" : ""}">✓ SOLVED</span></div>
@@ -858,6 +895,7 @@ function render() {
     <p class="module-lede">${lesson.lede}</p>
     <div class="question-card"><span class="question-symbol">?</span><div><p class="question-label">YOUR PROBLEM</p><p>${lesson.question}</p></div></div>
     <p class="idea-row"><span class="bulb">✳</span><span><b>The idea.</b> ${lesson.idea}</span></p>
+    ${proofPrompt}
     <div class="learning-resources">${toolBox}${visual}</div>
     <section class="notebook-card" aria-labelledby="notebook-heading">
       <div class="notebook-heading"><div><p class="notebook-kicker">YOUR NUMBER THEORY LAB · SAGE MODE</p><h3 id="notebook-heading">Compute it here</h3></div><a class="notebook-popout" href="${notebookLink(lesson)}" target="_blank" rel="noopener noreferrer">Open in a separate tab <span aria-hidden="true">↗</span></a></div>
@@ -866,6 +904,7 @@ function render() {
     </section>
     <details class="work-hint"><summary>Need a nudge?</summary><p>${lesson.hint}</p></details>
     <div class="answer-block"><p class="answer-title">BRING YOUR RESULT BACK HERE</p><form class="answer-form" id="answer-form"><input class="answer-input" id="answer-input" autocomplete="off" spellcheck="false" aria-label="Your answer" placeholder="${lesson.placeholder}" ${solved ? "disabled" : ""}><button class="check-button" type="submit" ${solved ? "disabled" : ""}>${solved ? "Solved ✓" : "Check answer"}</button></form><p class="answer-feedback ${solved ? "good" : ""}" id="answer-feedback" aria-live="polite">${solved ? lesson.success : "Use the Sagebrush notebook to work it out, then enter your result."}</p></div>
+    ${nextPaths}
     <div class="lesson-bottom"><span class="lesson-bottom-note">${lesson.concept}</span>${current > 0 ? `<button class="prev-button" id="prev-button" type="button">← Previous</button>` : ""}<button class="next-button ${solved && current < lessons.length - 1 ? "show" : ""}" id="next-button" type="button">${current === lessons.length - 1 ? "Curriculum complete" : "Next lesson"}<span>→</span></button></div>`;
   mountNotebook(lesson, $("#sagebrush-notebook", panel), notebookGeneration);
   $("#answer-form", panel).addEventListener("submit", event => {

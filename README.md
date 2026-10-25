@@ -1,6 +1,6 @@
 # Number Theory Fieldnotes
 
-A static, GitHub Pages course for computational number theory and Sagebrush. It has six chapters and 27 lessons, introducing prime numbers before factorization, then coprimality and modular arithmetic before Euler's totient, followed by finite fields, RSA, quadratic fields, and class groups. Every lesson embeds its own editable Sage-mode Sagebrush notebook in the page, so learners can compute and check their result without leaving the course. A separate-tab link is available as a fallback. Lesson notebooks and course progress are saved in this browser.
+A static, GitHub Pages course for computational number theory and Sagebrush. It has six chapters and 28 lessons, introducing prime numbers before factorization, then coprimality and modular arithmetic before Euler's totient, followed by finite fields, RSA, quadratic fields, and class groups. Selected lessons include short proof prompts alongside computation. Every lesson embeds its own editable Sage-mode Sagebrush notebook in the page, so learners can compute and check their result without leaving the course. A separate-tab link is available as a fallback. Lesson notebooks and course progress are saved in this browser.
 
 ## Curriculum
 
@@ -10,6 +10,15 @@ A static, GitHub Pages course for computational number theory and Sagebrush. It 
 4. Finite fields and groups: field arithmetic, quadratic residues, multiplicative order, and generators.
 5. RSA and public-key arithmetic: key parameters, modular inverses, encryption, and decryption.
 6. Quadratic fields and class groups: discriminants, ideal classes, unique factorization, and prime splitting.
+
+## Where to continue
+
+The main course introduces these areas but does not attempt to cover them fully. Suggested follow-on routes:
+
+- **Elementary number theory:** quadratic residues → quadratic reciprocity → modular square roots → Pell equations → continued fractions.
+- **Computational number theory and cryptography:** primality tests such as Miller–Rabin → discrete logarithms → Diffie–Hellman and ElGamal → stronger factoring methods.
+- **Algebraic number theory:** norms and rings of integers → ideals and ideal factorization → class groups and units → prime splitting in more general number fields.
+- **Elliptic curves:** finite-field arithmetic and groups (from Chapters 4–5) → curve equations and the point-addition law → point counting → elliptic-curve discrete logarithms and cryptography. Elliptic curves are not taught in the current 28 lessons.
 
 ## Run locally
 
