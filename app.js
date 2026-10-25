@@ -16,8 +16,8 @@ const chapters = [
   },
   {
     id: "finite-fields", title: "Finite fields & groups", short: "Finite fields",
-    overview: "Arithmetic modulo a prime forms a finite field. Its nonzero elements make a cyclic group, linking equations to structure.",
-    goals: "Compute in a finite field, identify quadratic residues, measure multiplicative order, and find generators."
+    overview: "Arithmetic modulo a prime forms a finite field. Its nonzero elements make a unit group, linking inverses, cycles, and generators.",
+    goals: "Compute in a finite field, understand its unit group, identify quadratic residues, measure multiplicative order, and find generators."
   },
   {
     id: "rsa", title: "RSA & public-key arithmetic", short: "RSA",
@@ -28,6 +28,11 @@ const chapters = [
     id: "quadratic-fields", title: "Quadratic fields & class groups", short: "Number fields",
     overview: "Move from integers to numbers such as √−5. Algebraic integers have their own discriminants, primes, and factorization behavior.",
     goals: "Construct quadratic fields, compute discriminants and class numbers, and inspect how a rational prime splits."
+  },
+  {
+    id: "elliptic-curves", title: "Elliptic curves", short: "Elliptic curves",
+    overview: "Use the finite fields and group ideas from earlier chapters to study points on cubic curves, then see how point arithmetic enables a key-agreement protocol.",
+    goals: "Construct a curve over a finite field, add points, measure point order, explore the elliptic-curve discrete logarithm, and build toy Diffie–Hellman."
   }
 ];
 
@@ -221,6 +226,17 @@ const lessons = [
     concept: "Finite fields make arithmetic cyclic and predictable, which is why they appear in coding and cryptography."
   },
   {
+    id: "unit-group", chapter: 3, title: "Meet the unit group of a finite field", topic: "UNIT GROUPS", time: "6 MIN",
+    lede: "Multiplication in a field has an identity and inverses for every nonzero element. Those nonzero elements form a group called the unit group.",
+    question: "How many elements are in the unit group of <span class=\"math\">𝔽₁₃</span>? Count the nonzero field elements.",
+    idea: "The zero element has no multiplicative inverse, so it is excluded. The remaining 12 elements form 𝔽₁₃ˣ under multiplication modulo 13.",
+    starter: "# Make the field with 13 elements\nF = GF(13)\n\n# List its nonzero elements (the units)\nunits = [a for a in F if a != 0]\nprint(units)\nlen(units)",
+    hint: "A list comprehension collects each <code>a</code> in <code>F</code> for which <code>a != 0</code>. Then <code>len(units)</code> counts the entries.",
+    answer: ["12"], placeholder: "size of 𝔽₁₃ˣ = ?",
+    success: "Exactly: there are 12 nonzero elements. Under multiplication they form the unit group 𝔽₁₃ˣ.",
+    concept: "Unit groups turn invertible elements into a group, a structure that also appears in the points of elliptic curves."
+  },
+  {
     id: "quadratic-residues", chapter: 3, title: "Recognize a quadratic residue", topic: "QUADRATIC RESIDUES", time: "6 MIN",
     lede: "A nonzero residue modulo p is a square if it equals x² for some x. Quadratic residues reveal structure in the field.",
     question: "Is <span class=\"math\">5</span> a square modulo <span class=\"math\">23</span>? Use the Legendre symbol to report +1 or −1.",
@@ -356,6 +372,63 @@ const lessons = [
     answer: ["2", "two"], placeholder: "number of prime ideals = ?",
     success: "Yes: 2 splits into two prime ideals in ℚ(√−23).",
     concept: "Prime splitting is one of the central links between field theory and arithmetic."
+  },
+
+  // Chapter 7 · Elliptic curves
+  {
+    id: "elliptic-curve", chapter: 6, title: "Meet an elliptic curve over a finite field", topic: "ELLIPTIC CURVES", time: "8 MIN",
+    lede: "An elliptic curve is a nonsingular cubic equation together with a special point at infinity. Over a finite field, its points form a finite group.",
+    question: "For <span class=\"math\">E: y² = x³ + 2x + 2</span> over <span class=\"math\">𝔽₁₇</span>, how many points are there, including the point at infinity?",
+    idea: "The finite field gives only finitely many coordinate pairs to check. This curve has 18 affine points; adding the point at infinity makes 19.",
+    starter: "# Build y^2 = x^3 + 2*x + 2 over the field with 17 elements\nF = GF(17)\nE = EllipticCurve(F, [2, 2])\n\n# Count all points, including the point at infinity\nE.cardinality()",
+    hint: "The list <code>E.points()</code> includes the point at infinity. Or ask Sage directly for <code>E.cardinality()</code>.",
+    answer: ["19"], placeholder: "number of points = ?",
+    success: "Correct: E has 19 points total—18 affine points and the point at infinity.",
+    concept: "Finite-field points give us a finite set on which to do the group operations in the next lesson."
+  },
+  {
+    id: "elliptic-addition", chapter: 6, title: "Add and double points", topic: "THE ELLIPTIC-CURVE GROUP LAW", time: "8 MIN",
+    lede: "Points on an elliptic curve can be added. Geometrically, a line through two points meets the cubic at a third point; reflect that point to get their sum.",
+    question: "On the same curve, let <span class=\"math\">P = (5,1)</span>. What are the coordinates of <span class=\"math\">2P = P+P</span>?",
+    idea: "For doubling on y²=x³+ax+b, the tangent slope is λ=(3x²+a)/(2y). At P=(5,1), modulo 17, λ=13 and 2P=(6,3). Sage performs this arithmetic in the field.",
+    starter: "# Recreate the curve and point P\nF = GF(17)\nE = EllipticCurve(F, [2, 2])\nP = E(5, 1)\n\n# Double P and display its affine coordinates\ndouble = 2 * P\ndouble.xy()",
+    hint: "Use <code>E(5,1)</code> to create P, then <code>2*P</code> to double it. The method <code>.xy()</code> displays its affine coordinates as a pair.",
+    answer: ["6,3", "(6,3)", "(6, 3)", "6 3"], placeholder: "coordinates of 2P = ?",
+    success: "Yes: 2P=(6,3). The tangent construction and the finite-field calculation give the same result.",
+    concept: "This addition law turns the curve's points into a group, with the point at infinity as its identity."
+  },
+  {
+    id: "elliptic-order", chapter: 6, title: "Follow repeated point addition", topic: "POINT ORDER", time: "6 MIN",
+    lede: "Adding P to itself repeatedly gives P, 2P, 3P, and so on. On a finite curve, this sequence eventually returns to the point at infinity.",
+    question: "What is the smallest positive integer <span class=\"math\">k</span> for which <span class=\"math\">kP</span> is the point at infinity, for <span class=\"math\">P=(5,1)</span>?",
+    idea: "The point's order is the first positive k for which kP=O. Here the order is 19, so the nonzero multiples of P run through all 18 affine points before returning to O.",
+    starter: "# Create the finite-field curve and point\nE = EllipticCurve(GF(17), [2, 2])\nP = E(5, 1)\n\n# Find the additive order of P\nP.order()",
+    hint: "Run <code>P.order()</code>. Sage checks repeated addition using the curve's group law.",
+    answer: ["19"], placeholder: "order of P = ?",
+    success: "Correct: P has order 19, and 19P is the point at infinity.",
+    concept: "Point order describes the cycle generated by repeatedly adding one point."
+  },
+  {
+    id: "elliptic-log", chapter: 6, title: "Find a discrete logarithm on the curve", topic: "ELLIPTIC-CURVE DISCRETE LOGARITHM", time: "7 MIN",
+    lede: "Given P and Q=kP, the elliptic-curve discrete logarithm problem asks for the hidden integer k.",
+    question: "Let <span class=\"math\">P=(5,1)</span> and <span class=\"math\">Q=7P</span> on the curve over <span class=\"math\">𝔽₁₇</span>. What integer k satisfies Q=kP?",
+    idea: "This tiny example can be solved by checking multiples. On carefully chosen large curves, finding k from P and Q is believed to be difficult; that is the security idea behind elliptic-curve cryptography.",
+    starter: "# Create the curve, base point, and Q = 7P\nE = EllipticCurve(GF(17), [2, 2])\nP = E(5, 1)\nQ = 7 * P\n\n# Recover k such that Q = k*P\nQ.log(P)",
+    hint: "The point method <code>Q.log(P)</code> searches for the scalar k with <code>k*P == Q</code>. Here the curve is intentionally tiny, so this is only a demonstration.",
+    answer: ["7"], placeholder: "discrete logarithm k = ?",
+    success: "Correct: Q=7P, so its discrete logarithm to base P is 7.",
+    concept: "The same point multiplication that is easy to compute can be hard to reverse on a large, well-chosen curve."
+  },
+  {
+    id: "elliptic-dh", chapter: 6, title: "Build toy elliptic-curve Diffie–Hellman", topic: "KEY AGREEMENT", time: "8 MIN",
+    lede: "Two people can combine private integers with public curve points to reach the same shared point without sending their private values.",
+    question: "With base point P=(5,1), Alice chooses 5 and Bob chooses 7. Does computing 5(7P) give the same point as 7(5P)? Enter True or False.",
+    idea: "Both calculations equal 35P. Since P has order 19, this is also 16P, the point (10,11). These tiny values are for learning only and provide no security.",
+    starter: "# Create the curve and shared base point\nE = EllipticCurve(GF(17), [2, 2])\nP = E(5, 1)\nalice_secret, bob_secret = 5, 7\n\nalice_public = alice_secret * P\nbob_public = bob_secret * P\nalice_shared = alice_secret * bob_public\nbob_shared = bob_secret * alice_public\n\nprint(alice_shared.xy())\nalice_shared == bob_shared",
+    hint: "Compute the public points with scalar multiplication, then multiply each public point by the other person's private integer. Compare the two shared points with <code>==</code>.",
+    answer: ["true", "yes"], placeholder: "Do the shared points match? (True/False)",
+    success: "True. Both sides get 35P=(10,11). A real protocol uses large parameters and additional safeguards.",
+    concept: "This is the basic idea behind elliptic-curve key agreement; the toy example makes the arithmetic visible."
   }
 ];
 
@@ -749,6 +822,90 @@ const lessonSupport = {
       ["len(L)", "Returns the number of entries in a list L. Thus len(K.primes_above(2)) counts the prime ideals above 2."],
       ["QuadraticField(d)", "Builds the field K in which Sage will factor the ideal generated by p."]
     ]
+  },
+  "unit-group": {
+    definitions: [
+      ["Unit", "An element with a multiplicative inverse in the same structure. In a field, every nonzero element is a unit and zero is not."],
+      ["Unit group F×", "The set of all nonzero elements of a field F, with multiplication as the operation. Its identity is 1, and every element has an inverse."],
+      ["Group", "A set with an associative operation, an identity element, and an inverse for every element. A group need not use ordinary multiplication."],
+      ["Order of a finite group", "The number of elements in the group. The unit group of F₁₃ has order 12 because F₁₃ has 13 elements and zero is excluded."]
+    ],
+    tools: [
+      ["GF(13)", "Creates the finite field with 13 elements and assigns it to F. Its elements can be represented by residues 0 through 12."],
+      ["[a for a in F if a != 0]", "Python-style list comprehension: go through each a in F and keep it when a != 0. The resulting list is exactly the unit group as a set."],
+      ["a != 0", "Tests whether a differs from zero. It returns True or False; this condition filters zero out of the field elements."],
+      ["len(units)", "Returns the number of entries in the list named units. Here it counts the elements of F₁₃ˣ and returns 12."],
+      ["print(units)", "Displays the list of nonzero field elements so you can inspect which values are being counted."]
+    ]
+  },
+  "elliptic-curve": {
+    definitions: [
+      ["Short Weierstrass equation", "An equation y² = x³ + ax + b. This unit uses such equations over a field whose characteristic is not 2 or 3."],
+      ["Elliptic curve", "The points satisfying a nonsingular short Weierstrass equation, together with a special point O at infinity. Nonsingular means the curve has no cusp or self-intersection; for this form the discriminant −16(4a³+27b²) must be nonzero."],
+      ["Finite-field point", "A pair (x,y) from the field that satisfies the curve equation. These are the affine points; the point O is also included in the curve."],
+      ["Point at infinity O", "The identity element for elliptic-curve addition. It is a formal point, not a finite coordinate pair, and it is included in the total point count."]
+    ],
+    tools: [
+      ["GF(17)", "Creates the finite field with 17 elements. Coordinates and coefficients in the example are calculated modulo 17."],
+      ["EllipticCurve(F, [a, b])", "Creates the curve y² = x³ + a*x + b over the field F. The coefficient list [2, 2] means a=2 and b=2."],
+      ["E.points()", "Lists the points on E, including the point at infinity O. For this curve the list has 19 points."],
+      ["E.cardinality()", "Returns the number of points on E, including O. For the example curve it returns 19."]
+    ]
+  },
+  "elliptic-addition": {
+    definitions: [
+      ["Elliptic-curve group law", "The rule for adding curve points. A line through two points meets a nonsingular cubic at a third point; reflecting that third point across the x-axis gives their sum."],
+      ["Point doubling", "Adding a point P to itself, written 2P. Geometrically, use the tangent line at P in place of a line through two distinct points."],
+      ["Tangent slope", "For y²=x³+ax+b at P=(x,y) with y≠0, the slope is λ=(3x²+a)/(2y), computed in the field. For P=(5,1) here, λ=13 modulo 17."],
+      ["Affine coordinates", "The ordinary pair (x,y) for a point other than O. The point at infinity has no affine coordinate pair."]
+    ],
+    tools: [
+      ["E(x, y)", "Creates the curve point with coordinates x and y, after checking that it satisfies the curve equation."],
+      ["2*P", "Scalar multiplication syntax: add P to itself twice in the group law. The result here is the point (6,3)."],
+      ["double.xy()", "Calls the .xy() method on the point stored in double and returns its affine coordinate pair. It cannot be used for O."],
+      ["P + Q", "Adds two curve points with the elliptic-curve group law; Sage handles the line, tangent, and finite-field arithmetic."]
+    ]
+  },
+  "elliptic-order": {
+    definitions: [
+      ["Scalar multiple kP", "The point obtained by adding P to itself k times when k is positive. Sage also allows zero and negative integer scalars."],
+      ["Identity point O", "The point at infinity, which satisfies P+O=P for every point P."],
+      ["Order of a point", "The smallest positive integer k for which kP=O. Because the curve has finitely many points, every point has a finite order."],
+      ["Generated subgroup", "The set of all integer multiples of P. If P has order 19, its multiples are O,P,2P,...,18P and then return to O."]
+    ],
+    tools: [
+      ["P.order()", "Returns the additive order of P: the smallest positive k with k*P equal to O."],
+      ["n*P", "Computes the scalar multiple of P by integer n using the curve's group operation."],
+      ["P == Q", "Tests whether two curve points are equal, including whether both are the point at infinity."]
+    ]
+  },
+  "elliptic-log": {
+    definitions: [
+      ["Base point", "The chosen point P whose multiples describe the subgroup it generates."],
+      ["Scalar", "An integer k used to multiply a group point, as in Q=kP."],
+      ["Elliptic-curve discrete logarithm", "Given P and Q, find an integer k such that Q=kP. For a large, carefully selected curve and subgroup, this is believed to be computationally difficult."],
+      ["Subgroup generated by P", "The set of all integer multiples of P. A discrete logarithm to base P is sought among these multiples."]
+    ],
+    tools: [
+      ["Q.log(P)", "Searches for an integer k such that k*P=Q and returns k. This Sage method is practical here because the example group is tiny."],
+      ["k*P", "Uses integer scalar multiplication to compute the point associated with scalar k and base point P."],
+      ["Q == k*P", "Checks whether candidate scalar k produces Q. The equality test returns True or False."]
+    ]
+  },
+  "elliptic-dh": {
+    definitions: [
+      ["Private scalar", "A secret integer chosen by one participant. Alice and Bob keep their own private scalars private."],
+      ["Public point", "The point obtained by multiplying the agreed base point P by a participant's private scalar. It can be shared publicly."],
+      ["Shared point", "The point each participant computes by multiplying their private scalar by the other's public point. Both calculations equal (ab)P."],
+      ["Diffie–Hellman key agreement", "A protocol idea where two participants compute the same shared value from public data and separate private scalars, without sending the shared value itself."],
+      ["Toy parameters", "Small values chosen to make arithmetic easy to inspect. They are insecure and must not be used to protect real information."]
+    ],
+    tools: [
+      ["alice_secret * P", "Multiplies base point P by Alice's private integer to make her public point."],
+      ["alice_secret * bob_public", "Multiplies Bob's public point by Alice's private scalar to compute Alice's shared point. Bob computes the symmetric expression."],
+      ["alice_shared == bob_shared", "Compares the two points and returns True when both sides computed the same shared point."],
+      ["alice_shared.xy()", "Returns the shared point's affine coordinate pair, (10,11) in this small example."]
+    ]
   }
 };
 
@@ -765,6 +922,12 @@ lessonSupport["prime-splitting"].visual = {
   caption: "In the ring of integers of ℚ(√−23), the ideal generated by 2 factors into two distinct prime ideals.",
   svg: `<svg viewBox="0 0 560 128" role="img" aria-label="The ideal generated by 2 factors into two distinct prime ideals"><rect x="206" y="8" width="148" height="40" rx="7" fill="#eef3eb" stroke="#d5e0d3"/><text x="280" y="33" text-anchor="middle" fill="#285b43" font-family="serif" font-size="19">(2)O_K</text><path d="M280 48v23M280 71H150v14M280 71h130v14" fill="none" stroke="#829384" stroke-width="2"/><rect x="73" y="86" width="154" height="35" rx="7" fill="#e3ede1" stroke="#b9d0bc"/><rect x="333" y="86" width="154" height="35" rx="7" fill="#e3ede1" stroke="#b9d0bc"/><text x="150" y="109" text-anchor="middle" fill="#285b43" font-family="serif" font-size="16">𝔭₁</text><text x="410" y="109" text-anchor="middle" fill="#285b43" font-family="serif" font-size="16">𝔭₂</text><text x="280" y="125" text-anchor="middle" fill="#718074" font-family="monospace" font-size="9">two distinct prime ideals</text></svg>`,
   source: "K = QuadraticField(-23)\nideals = K.primes_above(2)\nprint(len(ideals))  # 2\nprint(ideals)  # the two prime ideals above 2"
+};
+lessonSupport["elliptic-curve"].visual = {
+  title: "Points on E over F₁₇",
+  caption: "Each dot is an affine solution to y²=x³+2x+2 modulo 17. The point at infinity O is the nineteenth point.",
+  svg: `<svg viewBox="0 0 560 260" role="img" aria-label="Grid plot of the eighteen affine points on the elliptic curve modulo 17"><g stroke="#e1e5dc" stroke-width="1">${Array.from({length:17},(_,i)=>{const x=44+i*28,y=20+i*13;return `<line x1="44" y1="${y}" x2="492" y2="${y}"/><line x1="${x}" y1="20" x2="${x}" y2="228"/>`}).join("")}</g><g fill="#718074" font-family="monospace" font-size="8" text-anchor="middle">${Array.from({length:17},(_,i)=>`<text x="${44+i*28}" y="245">${i}</text>`).join("")}</g><g fill="#718074" font-family="monospace" font-size="8" text-anchor="end">${Array.from({length:17},(_,i)=>`<text x="35" y="${223-i*12.7}">${i}</text>`).join("")}</g><g fill="#285b43">${[[0,6],[0,11],[3,1],[3,16],[5,1],[5,16],[6,3],[6,14],[7,6],[7,11],[9,1],[9,16],[10,6],[10,11],[13,7],[13,10],[16,4],[16,13]].map(([x,y])=>`<circle cx="${44+x*28}" cy="${228-y*12.7}" r="4.2"/>`).join("")}</g><path d="M44 228H492M44 228V20" fill="none" stroke="#829384" stroke-width="1.5"/><text x="500" y="231" fill="#718074" font-family="monospace" font-size="9">x</text><text x="40" y="15" fill="#718074" font-family="monospace" font-size="9">y</text><rect x="420" y="8" width="125" height="20" rx="5" fill="#eef3eb"/><text x="482" y="22" text-anchor="middle" fill="#285b43" font-family="monospace" font-size="9">plus O = 19 total</text></svg>`,
+  source: "E = EllipticCurve(GF(17), [2, 2])\nprint(E.points())  # all 18 affine points and the point at infinity O"
 };
 
 const storageKey = "nt-fieldnotes-progress-v2";
@@ -880,7 +1043,7 @@ function render() {
   const toolBox = `<section class="learning-box tool-box" aria-label="New Sagebrush code tools"><h3><span class="learning-box-icon">{ }</span>New code tools · Sage mode</h3><dl>${support.tools.map(([name, description]) => `<div><dt><code>${escapeHtml(name)}</code></dt><dd>${escapeHtml(description)}</dd></div>`).join("")}</dl><p class="tool-note">Sage mode accepts Python-style assignment, loops, and lists. Sage's <code>^</code> means exponentiation; in regular Python use <code>**</code>.</p></section>`;
   const proofPrompt = lesson.proof ? `<details class="proof-prompt"><summary>Try a short proof</summary><p>${escapeHtml(lesson.proof)}</p></details>` : "";
   const visual = support.visual ? `<figure class="math-visual"><figcaption><strong>${escapeHtml(support.visual.title)}</strong><span>${escapeHtml(support.visual.caption)}</span></figcaption>${support.visual.svg}<details><summary>Recreate the figure's data with Sage/Python</summary><pre><code>${escapeHtml(support.visual.source)}</code></pre></details></figure>` : "";
-  const nextPaths = current === lessons.length - 1 ? `<section class="next-paths"><h3>Where to go next</h3><p>This course gives you a starting point in each area. These are natural continuations:</p><ul><li><b>Elementary number theory:</b> quadratic reciprocity → modular square roots → Pell equations → continued fractions.</li><li><b>Computational number theory and cryptography:</b> Miller–Rabin primality testing → discrete logarithms → Diffie–Hellman and ElGamal → stronger factoring methods.</li><li><b>Algebraic number theory:</b> norms and rings of integers → ideals and ideal factorization → class groups and units → prime splitting in general number fields.</li><li><b>Elliptic curves:</b> finite fields and groups → curve equations and point addition → point counting → elliptic-curve discrete logarithms and cryptography. Elliptic curves are not covered in this course.</li></ul></section>` : "";
+  const nextPaths = current === lessons.length - 1 ? `<section class="next-paths"><h3>Where to go next</h3><p>This course gives you a starting point in each area. These are natural continuations:</p><ul><li><b>Elementary number theory:</b> quadratic reciprocity → modular square roots → Pell equations → continued fractions.</li><li><b>Computational number theory and cryptography:</b> Miller–Rabin primality testing → discrete logarithms → Diffie–Hellman and ElGamal → stronger factoring methods.</li><li><b>Algebraic number theory:</b> norms and rings of integers → ideals and ideal factorization → class groups and units → prime splitting in general number fields.</li><li><b>Elliptic curves:</b> curves over extension fields → faster point counting → isogenies → cryptographic implementation and security.</li></ul></section>` : "";
   panel.innerHTML = `
     <div class="module-meta"><span class="module-tag">${lesson.topic}</span><span>CH ${String(lesson.chapter + 1).padStart(2, "0")} · LESSON ${chapterLesson} / ${chapterLessons}</span><span>·</span><span>${lesson.time}</span></div>
     <div class="module-heading"><h2>${lesson.title}</h2><span class="solved-stamp ${solved ? "show" : ""}">✓ SOLVED</span></div>
