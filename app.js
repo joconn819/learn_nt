@@ -523,6 +523,177 @@ for (const lesson of extensionLessons) {
   delete lesson.support;
 }
 
+const capstoneLessons = [
+  {
+    id:"capstone-integers", chapter:0, codingAssignment:true, time:"20 MIN", topic:"CHAPTER CODING ASSIGNMENT",
+    title:"Build an integer analyzer", lede:"Write a reusable function that factors an integer by trial division, lists the numbers coprime to it, and computes its totient without calling Sage's factor or totient functions.",
+    question:"Analyze n=360. Your function should return its prime factor list, the count of integers 1 through 360 coprime to it, and the list itself. Enter the totient count.",
+    idea:"This assignment combines prime factorization, divisibility, gcd, loops, and Euler's totient. Check that your factors multiply back to n and that each listed value has gcd 1 with n.",
+    starter:"# Write analyze_integer(n) from the requirements above\n# Keep the work in your own loops; do not call factor(n) or euler_phi(n).\n",
+    hints:["Start with trial division to build a factor list, then verify its product is n.","Make a second pass from 1 through n and keep k exactly when gcd(k,n)==1.","Return the factors, the length of the coprime list, and the list itself. Compare the count with euler_phi(n) only after your function works."],
+    answer:["96"], placeholder:"φ(360) = ?", success:"Correct: φ(360)=96. Your analyzer should also report 360's prime factors and all 96 coprime residues.",
+    sageCommand:"factor(n); euler_phi(n)", concept:"You have combined factorization and coprimality into a small arithmetic-analysis tool.",
+    support:{definitions:[["Function","A named block of code that accepts inputs and can return a result."],["Euler's totient φ(n)","The count of integers from 1 through n that are coprime to n."],["Coprime list","The integers k in the chosen range for which gcd(k,n)=1."]],tools:[["def analyze_integer(n):","Defines your reusable function with integer input n."],["return value","Sends one or more results back to the caller."],["list.append(value)","Adds a value to the end of a list."],["len(values)","Counts items in a list; it gives the number of coprime integers."],["gcd(k,n)","Returns the greatest common divisor of k and n."]]}
+  },
+  {
+    id:"capstone-congruences", chapter:1, codingAssignment:true, time:"20 MIN", topic:"CHAPTER CODING ASSIGNMENT",
+    title:"Synchronize three repeating clocks", lede:"Write a solver for simultaneous congruences by searching one combined period, and report every solution in a range rather than only the first match.",
+    question:"Find all 0≤x<105 satisfying x≡2 (mod 3), x≡3 (mod 5), and x≡2 (mod 7). Return the solution list and enter its least value.",
+    idea:"The moduli are pairwise coprime, so the Chinese remainder theorem gives one solution modulo their product, 105. Your search should check each residue in that full period.",
+    starter:"# Write a function that searches a full period and returns all matches\n# Test the three congruences from the assignment.\n",
+    hints:["Compute the period as 3*5*7. Use one list to store every candidate that passes all three remainder tests.","Use a combined condition with and; each test has the form x % modulus == target.","Check that your result repeats after adding 105. Sage has a two-congruence crt helper for an independent partial check."],
+    answer:["23"], placeholder:"least solution = ?", success:"Correct: the only solution in [0,105) is 23.", sageCommand:"crt(2, 3, 3, 5)", concept:"Your solver has turned three repeating schedules into one period and a verified solution set.",
+    support:{definitions:[["Congruence system","A collection of remainder conditions that must hold for the same integer."],["Combined period","A modulus after which all congruence conditions repeat together; for pairwise coprime moduli it is their product."],["Chinese remainder theorem","For pairwise coprime moduli, any choices of residues have exactly one simultaneous solution modulo their product."]],tools:[["%","Returns the remainder used to test each congruence."],["and","Combines Boolean conditions; all parts must be True."],["range(period)","Iterates through each integer from 0 to period−1."],["solutions.append(x)","Adds a matching integer to the result list."],["crt(a,b,m,n)","Sage finds the integer matching a modulo m and b modulo n; combine pairwise results for a larger system."]]}
+  },
+  {
+    id:"capstone-primes", chapter:2, codingAssignment:true, time:"25 MIN", topic:"CHAPTER CODING ASSIGNMENT",
+    title:"Map prime gaps with a sieve", lede:"Build a sieve to list all primes below a bound, then use your list to find the largest gap between consecutive primes.",
+    question:"For all primes below 500, report the largest consecutive-prime gap. Your program should also print the prime count and the two primes at the ends of that gap. Enter the gap size.",
+    idea:"The sieve reuses divisibility and prime factor ideas, while the gap analysis compares neighboring entries in an ordered list.",
+    starter:"# Implement a sieve and analyze consecutive prime gaps below 500\nbound = 500\n",
+    hints:["Create a Boolean list indexed by integers; mark 0 and 1 composite.","For each still-marked prime p, cross out multiples beginning at p*p and stepping by p.","Build a prime list from the remaining True entries, then compare each adjacent pair and retain the largest difference."],
+    answer:["14"], placeholder:"largest prime gap = ?", success:"Correct: the largest gap below 500 is 14, between 317 and 331; there are 95 primes below 500.",
+    sageCommand:"prime_range(bound)", concept:"This turns a prime list into a small experiment about how prime density changes.",
+    support:{definitions:[["Sieve of Eratosthenes","A prime-generation algorithm that repeatedly marks multiples of each prime as composite."],["Consecutive primes","Neighboring primes in increasing order, with no prime between them."],["Prime gap","The difference between consecutive primes."]],tools:[["[True] * bound","Creates one Boolean table entry for each integer index below bound."],["range(start,stop,step)","Iterates from start by step until just before stop; use step=p to cross out multiples."],["primes.append(p)","Adds a surviving prime candidate to the ordered prime list."],["zip(primes,primes[1:])","Pairs each prime with the next one so their gaps can be measured."],["max(values)","Returns the largest value in a nonempty sequence."]]}
+  },
+  {
+    id:"capstone-finite-fields", chapter:3, codingAssignment:true, time:"25 MIN", topic:"CHAPTER CODING ASSIGNMENT",
+    title:"Audit the nonzero residues modulo 29", lede:"Write a program that builds the powers of each nonzero residue, finds the least generator of the unit group, and classifies nonzero residues as squares or nonsquares.",
+    question:"For p=29, return the least primitive root and lists of quadratic residues and nonresidues. Enter the least primitive root.",
+    idea:"A generator has p−1 distinct powers. The quadratic residues are the nonzero squares; quadratic reciprocity predicts Legendre-symbol values, which you can compare with your own list.",
+    starter:"# Build the unit group, search for a generator, and classify squares\np = 29\n",
+    hints:["For each candidate g from 2 upward, build powers g^k mod p for k=0,…,p−2 and count distinct values.","The first candidate with p−1 distinct powers is the least generator. Build squares by squaring every nonzero residue.","Compare your square test for a with legendre_symbol(a,p); never use the Jacobi symbol as a square guarantee for composite moduli."],
+    answer:["2"], placeholder:"least primitive root = ?", success:"Correct: 2 generates all 28 nonzero residues modulo 29.",
+    sageCommand:"primitive_root(p)", concept:"You have explored the cyclic unit group and the square structure inside a finite field.",
+    support:{definitions:[["Unit group (Z/pZ)×","The nonzero residues modulo prime p under multiplication; it has p−1 elements."],["Primitive root","A residue whose powers generate every nonzero residue modulo p."],["Quadratic residue modulo p","A residue congruent to a square; a nonzero residue is classified by its Legendre symbol."]],tools:[["set()","Creates a collection of distinct values, useful for checking whether powers repeat."],["pow(a,k,p)","Python's three-input power computes a^k modulo p efficiently."],["primitive_root(p)","Sage returns a generator of the nonzero residues modulo prime p."],["legendre_symbol(a,p)","Sage returns 1 for a nonzero square and −1 for a nonsquare modulo prime p."]]}
+  },
+  {
+    id:"capstone-rsa", chapter:4, codingAssignment:true, time:"25 MIN", topic:"CHAPTER CODING ASSIGNMENT",
+    title:"Implement a complete toy RSA exchange", lede:"Choose the public parameters, derive the private exponent, encrypt a message, and decrypt it. Write your own square-and-multiply routine for the powers.",
+    question:"Use p=61, q=53, e=17, and message m=65. Implement modular exponentiation yourself, then encrypt and decrypt. Enter the recovered message.",
+    idea:"The private exponent is the inverse of e modulo φ(n). Your code should verify both the modular inverse identity and that decryption recovers the original message.",
+    starter:"# Build RSA key values and write your own modular-power helper\np, q, e, m = 61, 53, 17, 65\n",
+    hints:["Compute n=p*q and phi=(p-1)*(q-1); find d with an extended-gcd identity or inverse_mod after your own function is written.","Your modular-power function should repeatedly square the base and halve the exponent, multiplying the result when the current exponent is odd.","Set c=encrypt(m,e,n), then recovered=decrypt(c,d,n). Also check e*d % phi == 1."],
+    answer:["65"], placeholder:"recovered message = ?", success:"Correct: RSA decrypts the ciphertext back to 65. The key is intentionally tiny and insecure.",
+    sageCommand:"power_mod(m,e,n); power_mod(c,d,n)", concept:"This integrates modular inverses and fast powers into a full public-key arithmetic workflow.",
+    support:{definitions:[["RSA public key","The pair (n,e), where n=pq is a product of secret primes and e is the public exponent."],["Private exponent d","The integer satisfying e*d≡1 modulo φ(n)."],["Square-and-multiply","A modular exponentiation method that processes the exponent in binary using repeated squaring."]],tools:[["inverse_mod(e,phi)","Returns d such that e*d is congruent to 1 modulo phi."],["power_mod(a,k,n)","Sage's built-in modular exponentiation for checking your implementation."],["%","Reduces intermediate products to their remainders modulo n."],["// 2","Integer division by two, used to halve the exponent without fractions."]]}
+  },
+  {
+    id:"capstone-number-fields", chapter:5, codingAssignment:true, time:"25 MIN", topic:"CHAPTER CODING ASSIGNMENT",
+    title:"Classify small primes in Q(√−5)", lede:"Use the discriminant and Legendre symbols to classify each rational prime as split, inert, or ramified in a quadratic field.",
+    question:"For K=Q(√−5), classify all primes p≤29. Count the split primes and print each category. Enter the split-prime count.",
+    idea:"The field discriminant is −20. For odd p not dividing the discriminant, the Legendre symbol (−20/p) distinguishes split from inert; primes dividing the discriminant ramify.",
+    starter:"# Classify primes up to 29 using the field discriminant\nD = -20\n",
+    hints:["Generate the primes up to 29. A prime dividing D is ramified.","For other primes, legendre_symbol(D,p)==1 means split and −1 means inert.","Keep the categories in separate lists and check that every prime appears exactly once."],
+    answer:["4"], placeholder:"number of split primes = ?", success:"Correct: 3, 7, 23, and 29 split, so there are four split primes in the requested range.",
+    sageCommand:"legendre_symbol(D,p)", concept:"The splitting behavior of primes is encoded by the quadratic character of the field discriminant.",
+    support:{definitions:[["Quadratic field Q(√d)","A degree-two extension of the rational numbers obtained by adjoining a square root."],["Discriminant","An integer invariant of a number field that controls ramification and helps determine prime splitting."],["Split / inert / ramified prime","A rational prime is split if it yields two prime ideals, inert if it stays prime, and ramified if its ideal factorization has a repeated prime ideal."]],tools:[["QuadraticField(-5)","Constructs K=Q(√−5) in Sage."],["K.discriminant()","Returns the field discriminant; for Q(√−5) it is −20."],["legendre_symbol(D,p)","Returns the quadratic character for an odd prime p not dividing D."],["prime_range(2,30)","Returns primes 2≤p<30; the stop bound is excluded."]]}
+  },
+  {
+    id:"capstone-elliptic", chapter:6, codingAssignment:true, time:"25 MIN", topic:"CHAPTER CODING ASSIGNMENT",
+    title:"Explore one point's orbit on an elliptic curve", lede:"Enumerate the finite-field points on a curve, then follow repeated addition of a chosen point until you return to the identity.",
+    question:"On E: y²=x³+2x+2 over GF(17), count all points and find the order of P=(5,1). Print both values; enter the point order.",
+    idea:"Include the point at infinity in your count. For the orbit, begin at O and repeatedly add P until the result returns to O.",
+    starter:"# Count points and compute the order of P on E over GF(17)\nF = GF(17)\nE = EllipticCurve(F, [2,2])\n",
+    hints:["Enumerate x and y in F and test the Weierstrass equation; initialize the point count to 1 for O.","Create P=E(5,1), let Q=O, and count additions until Q returns to O.","Check your results with E.cardinality() and P.order() after the two loops work."],
+    answer:["19"], placeholder:"order of P = ?", success:"Correct: the curve has 19 points and P has order 19.",
+    sageCommand:"E.cardinality(); P.order()", concept:"This combines finite-field enumeration with the group law and point order.",
+    support:{definitions:[["Point at infinity O","The identity element in the elliptic-curve group; it has no affine coordinate pair."],["Point orbit generated by P","The sequence O,P,2P,3P,… formed by repeatedly adding P."],["Point order","The smallest positive integer k for which kP=O."]],tools:[["GF(17)","Constructs the finite field with 17 elements."],["EllipticCurve(F,[a,b])","Constructs y²=x³+ax+b over F."],["E(x,y)","Creates a point on E from affine coordinates."],["E.cardinality() and P.order()","Built-in checks for the number of curve points and the order of P."]]}
+  },
+  {
+    id:"capstone-quadratic-tools", chapter:7, codingAssignment:true, time:"25 MIN", topic:"CHAPTER CODING ASSIGNMENT",
+    title:"Implement Gauss's lemma as a Legendre-symbol tool", lede:"Turn Gauss's lemma into a function and compare it against Sage's Legendre symbol across many odd primes and residues.",
+    question:"Write a function that computes (a/p) using Gauss's lemma for every a=1,…,22 with p=23. It should agree with Sage for all inputs. Enter the value for a=5.",
+    idea:"Multiply a by 1,…,(p−1)/2, reduce to least positive residues, and count how many exceed p/2. The sign is (−1) to that count.",
+    starter:"# Implement Gauss's lemma and test it for p=23\np = 23\n",
+    hints:["For each multiplier k, compute r=(a*k)%p and replace r by p-r when r>p//2.","Count the replacements; return 1 for an even count and −1 for an odd count. Handle a divisible by p as 0 if you generalize the function.","Loop through all a values and compare your result with legendre_symbol(a,p)."],
+    answer:["-1","−1"], placeholder:"(5/23) = ?", success:"Correct: (5/23)=−1, and your function should match Sage for all tested a.",
+    sageCommand:"legendre_symbol(a,p)", concept:"A proof technique has become a working algorithm that you can test against the symbol definition.",
+    support:{definitions:[["Gauss's lemma","For odd prime p not dividing a, the Legendre symbol is (−1)^m, where m counts the least residues ak for 1≤k≤(p−1)/2 that exceed p/2."],["Least positive residue","The representative in {1,…,p−1} of a nonzero congruence class modulo p."],["Parity","Whether an integer is even or odd; it determines the sign (−1)^m."]],tools:[["range(1,(p-1)//2+1)","Iterates over exactly 1 through (p−1)/2."],["p-r","Reflects a residue above p/2 to its paired residue below p/2."],["count % 2","Returns 0 for even count and 1 for odd count."],["(-1)^count","Computes the sign determined by the crossing count."],["legendre_symbol(a,p)","Sage's Legendre-symbol result for comparison."]]}
+  },
+  {
+    id:"capstone-pell", chapter:8, codingAssignment:true, time:"30 MIN", topic:"CHAPTER CODING ASSIGNMENT",
+    title:"Find the fundamental solution to a Pell equation", lede:"Use convergents of √D to find the smallest positive solution of x²−Dy²=1, without scanning every x and y independently.",
+    question:"Write a reusable solver and apply it to D=13. Return x and y for the smallest positive solution; enter x.",
+    idea:"The convergents of √D give the best rational approximations. A convergent x/y that satisfies x²−Dy²=1 yields a Pell solution.",
+    starter:"# Find the first Pell solution using convergents of sqrt(D)\nD = 13\n",
+    hints:["Generate successive convergents to sqrt(D). For each fraction, read its numerator x and denominator y.","Test the exact integer expression x*x-D*y*y; stop at the first value equal to 1.","For D=13 the solution is much larger than the first few convergents, so iterate until the condition succeeds."],
+    answer:["649"], placeholder:"smallest x = ?", success:"Correct: the smallest positive solution is (x,y)=(649,180).", sageCommand:"continued_fraction(sqrt(D))", concept:"Continued fractions supply the unusually good approximations that expose Pell solutions.",
+    support:{definitions:[["Pell equation","The integer equation x²−Dy²=1 for positive nonsquare integer D."],["Fundamental solution","The smallest positive integer solution (x,y) to a Pell equation."],["Convergent","A rational approximation formed by truncating a continued fraction; its numerator and denominator provide Pell candidates."]],tools:[["continued_fraction(sqrt(D))","Builds the continued fraction of √D."],[".convergents()","Produces the successive rational approximations."],["fraction.numerator() / fraction.denominator()","Returns the integer numerator and denominator of a rational value."],["while True / break","Repeats until an explicit success condition is met, then exits the loop."]]}
+  },
+  {
+    id:"capstone-crypto", chapter:9, codingAssignment:true, time:"30 MIN", topic:"CHAPTER CODING ASSIGNMENT",
+    title:"Recover a message from a factored RSA modulus", lede:"Simulate a tiny RSA attack: factor the public modulus with Pollard's rho, reconstruct the totient and private exponent, then decrypt the ciphertext.",
+    question:"Given n=10403, e=7, and ciphertext c=295, recover the plaintext by implementing Pollard's rho and modular exponentiation. Enter the plaintext.",
+    idea:"The factors are small only for teaching. Once p and q are known, φ(n)=(p−1)(q−1), and d is the inverse of e modulo φ(n).",
+    starter:"# Factor n with Pollard's rho, rebuild the RSA private key, and decrypt\nn, e, c = 10403, 7, 295\n",
+    hints:["Use Floyd's one-step/two-step sequence and compute gcd(abs(x-y),n) until it finds a proper factor.","Let q=n//p, compute phi=(p-1)*(q-1), then find d with inverse_mod(e,phi).","Decrypt with your square-and-multiply routine. Verify that re-encrypting the result returns c."],
+    answer:["42"], placeholder:"plaintext = ?", success:"Correct: the recovered plaintext is 42. This tiny modulus provides no security.",
+    sageCommand:"factor(n); inverse_mod(e,phi); power_mod(c,d,n)", concept:"Factoring breaks the toy RSA key because it reveals the totient and therefore the private exponent.",
+    support:{definitions:[["Pollard's rho","A factorization method using a cycle in a modular sequence and gcd to expose a factor."],["RSA totient φ(pq)","For distinct primes p and q, the totient is (p−1)(q−1)."],["Ciphertext","The encrypted value c=m^e mod n; decryption uses the private exponent d."]],tools:[["gcd(abs(x-y),n)","Computes a potential factor from the distance between two sequence values."],["inverse_mod(e,phi)","Finds the private exponent d satisfying e*d≡1 mod φ(n)."],["factor(n)","Sage's built-in factorization for checking the Pollard-rho result."],["power_mod(c,d,n)","Computes the decrypted modular power efficiently."]]}
+  },
+  {
+    id:"capstone-coding-theory", chapter:10, codingAssignment:true, time:"30 MIN", topic:"CHAPTER CODING ASSIGNMENT",
+    title:"Encode, corrupt, and repair a message", lede:"Build an even-parity [7,4] Hamming encoder and syndrome decoder using bit lists. Detect a flipped bit, correct it, and recover the four data bits.",
+    question:"Encode message 1011 using parity positions 1, 2, and 4; flip bit 6; decode the received word. Enter the recovered four-bit message.",
+    idea:"The syndrome is the binary index of the bad position. Once you correct that bit, extract data from positions 3, 5, 6, and 7.",
+    starter:"# Implement the Hamming (7,4) encoder and syndrome decoder\nmessage = [1,0,1,1]\n",
+    hints:["Place data bits at 3,5,6,7 using 1-based positions; compute each parity bit so its check group has even sum.","For decoding, recompute the three parity checks. Combine their results as s1+2*s2+4*s4 to locate a single flipped bit.","Flip the indicated bit when the syndrome is nonzero, then read the four data positions. Compare with codes.HammingCode(GF(2),3) after your implementation."],
+    answer:["1011"], placeholder:"recovered message", success:"Correct: the decoder identifies bit 6, repairs it, and recovers 1011.",
+    sageCommand:"codes.HammingCode(GF(2),3)", concept:"This is a complete encode-transmit-detect-correct-decode cycle using finite-field parity.",
+    support:{definitions:[["Hamming (7,4) code","A binary linear code with 4 data bits and 3 parity bits; it corrects one bit error."],["Parity check","A sum modulo 2 used to ensure selected positions have even parity."],["Syndrome","The pattern of failed parity checks; for a single error it encodes the erroneous bit's position."]],tools:[["[0]*7","Creates a list of seven zero bits."],["sum(bits[i] for i in positions) % 2","Computes the parity of a selected set of bits. In Sage, ^ means exponentiation; this parity calculation uses ordinary integer addition followed by reduction modulo 2."],["bits[index] = 1-bits[index]","Flips a bit represented by 0 or 1; Python lists use zero-based indices."],["codes.HammingCode(GF(2),3)","Sage's built-in binary [7,4] Hamming code for comparison."]]}
+  },
+  {
+    id:"capstone-units", chapter:11, codingAssignment:true, time:"25 MIN", topic:"CHAPTER CODING ASSIGNMENT",
+    title:"Enumerate small units and find the generator", lede:"In Z[√2], enumerate positive units up to a real bound by testing whether their norm is ±1, then identify the smallest unit greater than 1.",
+    question:"List all units x+y√2 with 1<x+y√2<10 and x,y nonnegative integers. How many are there?", idea:"The norm is x²−2y². In this ring, an element is a unit exactly when its norm is 1 or −1; powers of the fundamental unit generate further examples.",
+    starter:"# Enumerate units in Z[sqrt(2)] below the real bound 10\n",
+    hints:["Loop over a finite range of x and y, compute norm=x*x-2*y*y, and retain norm ±1.","Use a numerical approximation to test 1 < x+y*sqrt(2) < 10; print exact x,y and norm alongside it.","Exclude the identity 1. You should find the fundamental unit and its next power."],
+    answer:["2"], placeholder:"number of units = ?", success:"Correct: the units greater than 1 and below 10 are 1+√2 and 3+2√2.", sageCommand:"K.units()", concept:"The norm test makes the unit equation concrete, while powers reveal the rank-one structure.",
+    support:{definitions:[["Unit in Z[√2]","An element x+y√2 with an inverse in the same ring; equivalently its norm x²−2y² is ±1."],["Fundamental unit","The smallest real unit greater than 1; here it is 1+√2."],["Unit rank","The number of independent infinite-order generators; Dirichlet's theorem gives rank 1 for Q(√2)."]],tools:[["sqrt(2)","Sage's exact square root used to evaluate the real embedding."],["abs(norm) == 1","Tests whether the integer norm is either +1 or −1."],["K.units()","Sage returns generators for the number field's unit group."],["rounding / numerical comparison","A numerical approximation is convenient for a bound; keep x,y and the norm as exact integers."]]}
+  },
+  {
+    id:"capstone-padics", chapter:12, codingAssignment:true, time:"25 MIN", topic:"CHAPTER CODING ASSIGNMENT",
+    title:"Lift a square root from 7 to 7³", lede:"Implement digit-by-digit Hensel lifting for a simple root of x²−2. Each new base-7 digit should preserve the solution modulo a higher power.",
+    question:"Start with root x=3 modulo 7 and lift it to a root modulo 343. Enter the least nonnegative lifted root.",
+    idea:"The derivative 2x is nonzero modulo 7 at x=3, so Hensel's lemma guarantees a unique compatible lift at each step.",
+    starter:"# Write a lifting function for f(x)=x^2-2 from modulus 7 to 343\nx, p, exponent = 3, 7, 3\n",
+    hints:["At a stage with root x modulo m, test candidates x+t*m for digits t=0,…,p−1 modulo p*m.","Keep the unique candidate for which candidate*candidate-2 is divisible by p*m.","Repeat until the modulus reaches p^3. Verify the result modulo 7, 49, and 343."],
+    answer:["108"], placeholder:"root modulo 343 = ?", success:"Correct: 108²−2 is divisible by 343, and 108 reduces to 3 modulo 7.", sageCommand:"valuation(x^2-2,7)", concept:"A simple root modulo a prime determines compatible solutions modulo higher prime powers.",
+    support:{definitions:[["Hensel lifting","A procedure that extends a solution modulo p^k to a compatible solution modulo p^(k+1)."],["Simple root","A root a of f modulo p for which the derivative f'(a) is nonzero modulo p."],["p-adic valuation","The exponent of p dividing an integer; a larger valuation means stronger divisibility by p."]],tools:[["range(p)","Tests each possible next base-p digit from 0 to p−1."],["candidate = x + digit*modulus","Appends one base-p digit while preserving the previous residue class."],["(candidate^2-2) % new_modulus == 0","Checks that the candidate is a root modulo the next prime power."],["valuation(n,p)","Sage returns the exponent of p dividing n."]]}
+  },
+  {
+    id:"capstone-analytic", chapter:13, codingAssignment:true, time:"25 MIN", topic:"CHAPTER CODING ASSIGNMENT",
+    title:"Measure prime density with your own sieve", lede:"Implement a prime-counting sieve up to 10,000, then compare the measured count with x/log(x), the scale predicted by the prime number theorem.",
+    question:"Your program should print π(10,000), the approximation 10,000/log(10,000), and their ratio. Enter the exact prime count.",
+    idea:"The prime number theorem is asymptotic: the ratio between π(x) and x/log(x) approaches 1 as x grows, though the values differ at finite x.",
+    starter:"# Build a sieve through 10,000 and compare pi(x) with x/log(x)\nx = 10000\n",
+    hints:["Use a Boolean table indexed through x; cross out multiples starting at p*p.","Count the remaining prime entries to obtain π(x). The endpoint x is included in this assignment.","Compute x/log(x) with Sage's natural logarithm function, then divide the exact count by the estimate."],
+    answer:["1229"], placeholder:"π(10,000) = ?", success:"Correct: π(10,000)=1229. The approximation is about 1085.7, so the ratio is above 1 at this value.", sageCommand:"prime_pi(x)", concept:"Your experiment compares an exact prime count with a large-scale analytic prediction.",
+    support:{definitions:[["Prime-counting function π(x)","The number of primes less than or equal to x."],["Prime Number Theorem","The ratio π(x)/(x/log(x)) tends to 1 as x grows."],["Natural logarithm log(x)","The inverse of the exponential function e^x; it gives the main scale in the prime-counting estimate."]],tools:[["[True]*(x+1)","Allocates a Boolean entry for every integer from 0 through x."],["range(2,x+1)","Visits potential prime indices including x."],["log(x)","Sage's natural logarithm, used in the analytic approximation."],["prime_pi(x)","Sage's built-in prime count for comparison after your sieve works."]]}
+  },
+  {
+    id:"capstone-advanced-elliptic", chapter:14, codingAssignment:true, time:"30 MIN", topic:"CHAPTER CODING ASSIGNMENT",
+    title:"Count points and test the Hasse bound", lede:"Write an efficient point counter for an elliptic curve over a prime field by precomputing square roots, then verify Hasse's bound.",
+    question:"For E: y²=x³+2x+3 over GF(101), count all points including O and check the Hasse bound. Enter the point count.",
+    idea:"For each x, compute the right-hand side and count how many y values square to it. A square-residue lookup table avoids checking every pair separately.",
+    starter:"# Count points on E over GF(101) using a precomputed square table\np, a, b = 101, 2, 3\n",
+    hints:["Build a dictionary that maps each square y² mod p to the number of y values producing it; 0 has one root and nonzero squares have two.","For each x, look up (x^3+a*x+b)%p and add its root count. Start the total at 1 for O.","Check abs(count-(p+1)) <= 2*sqrt(p) and compare the count with E.cardinality()."],
+    answer:["96"], placeholder:"#E(F_101) = ?", success:"Correct: this curve has 96 points over GF(101), and the Hasse bound holds.", sageCommand:"E.cardinality()", concept:"Efficient point counting connects finite-field computation to a theorem that constrains every elliptic curve.",
+    support:{definitions:[["Hasse bound","For an elliptic curve over F_q, |#E(F_q)−(q+1)|≤2√q."],["Square-residue table","A lookup structure recording how many field elements square to each residue."],["Weierstrass equation","An elliptic curve equation; here y²=x³+ax+b with nonzero discriminant."]],tools:[["GF(p)","Constructs the field with p elements when p is prime."],["dictionary.get(key,0)","Returns a stored count or 0 when the right-hand side is not a square."],["E.cardinality()","Sage's built-in finite-field point count for checking your implementation."],["abs(count-(p+1)) <= 2*sqrt(p)","Checks the Hasse bound; the comparison is True when the deviation is small enough."]]}
+  }
+];
+
+const capstoneSupport = {};
+for (const lesson of capstoneLessons) {
+  lesson.time ??= "25 MIN";
+  lesson.concept ??= lesson.idea;
+  lessons.push(lesson);
+  capstoneSupport[lesson.id] = lesson.support;
+  delete lesson.support;
+}
+lessons.sort((a, b) => a.chapter - b.chapter || Number(Boolean(a.codingAssignment)) - Number(Boolean(b.codingAssignment)));
+
 // Each lesson after the introductory gcd lesson names its new mathematics
 // explicitly and documents the Sage/Python tools used in its notebook.
 const sageShortcuts = {
@@ -1036,7 +1207,13 @@ const lessonSupport = {
     ]
   }
 };
-Object.assign(lessonSupport, extensionSupport);
+Object.assign(lessonSupport, extensionSupport, capstoneSupport);
+lessonSupport["capstone-integers"].tools.push(
+  ["factor(n)", "Sage's prime factorization for checking the list produced by your own trial division."],
+  ["euler_phi(n)", "Sage's built-in totient for checking the count from your coprime-list loop."]
+);
+lessonSupport["capstone-coding-theory"].tools.push(["GF(2)", "Constructs the field with two elements, used by Sage's binary Hamming-code constructor."]);
+lessonSupport["capstone-units"].tools.push(["N(x)", "Returns a numerical approximation of x, useful for checking the real bound while keeping x and y exact."]);
 lessonSupport["baby-step-giant-step"].tools.push(
   ["ceil(sqrt(order))", "Computes the ceiling of the square root to choose the baby-step table size."],
   ["baby = {}", "Creates an empty dictionary, a mutable key-value table."],
@@ -1293,19 +1470,19 @@ async function mountNotebook(lesson, host, generation) {
     });
     mountedKernel = kernel;
     mountedNotebook = notebook;
-    const starterCode = lesson.algorithm ? "" : lesson.starter;
+    const starterCode = lesson.algorithm || lesson.codingAssignment ? "" : lesson.starter;
     const cells = [
       {
         id: cellId(),
         type: "markdown",
-        code: `# ${lesson.title}\n\n${lesson.lede}\n\n**Problem:** ${lesson.question.replace(/<[^>]*>/g, "")}\n\n${lesson.algorithm ? "Use the plan above to write your algorithm in the empty code cell below." : "Edit the starter cell below."} Press **Shift+Enter** to run it.`
+        code: `# ${lesson.title}\n\n${lesson.lede}\n\n**Problem:** ${lesson.question.replace(/<[^>]*>/g, "")}\n\n${lesson.algorithm ? "Use the plan above to write your algorithm in the empty code cell below." : lesson.codingAssignment ? "This is a chapter coding assignment. Start from a blank code cell and write a complete program." : "Edit the starter cell below."} Press **Shift+Enter** to run it.`
       },
       { id: cellId(), code: starterCode }
     ];
     kernel.start();
     // Algorithm lessons use a fresh notebook record with a blank code cell;
     // earlier saved starters remain in IndexedDB and are not deleted.
-    const notebookId = `fieldnotes-${lesson.id}${lesson.algorithm ? "-learner" : ""}`;
+    const notebookId = `fieldnotes-${lesson.id}${lesson.algorithm || lesson.codingAssignment ? "-learner" : ""}`;
     await notebook.attach(new IdbStore(db, notebookId, { name: lesson.title, mode: "sage", cells }));
     if (generation !== notebookGeneration) {
       notebook.destroy();
@@ -1324,8 +1501,8 @@ async function mountNotebook(lesson, host, generation) {
 
 function notebookLink(lesson) {
   const data = JSON.stringify([
-    { md: `# ${lesson.title}\n\n${lesson.lede}\n\n**Problem:** ${lesson.question.replace(/<[^>]*>/g, "")}\n\n${lesson.algorithm ? "Use the pseudocode plan to write and run your own implementation." : "Work it out in Sage mode by editing the code cell."} Press **Shift+Enter** to run it, then explain what the output means.` },
-    lesson.algorithm ? "" : lesson.starter
+    { md: `# ${lesson.title}\n\n${lesson.lede}\n\n**Problem:** ${lesson.question.replace(/<[^>]*>/g, "")}\n\n${lesson.algorithm ? "Use the pseudocode plan to write and run your own implementation." : lesson.codingAssignment ? "This is a chapter coding assignment. Start from a blank code cell and write a complete program." : "Work it out in Sage mode by editing the code cell."} Press **Shift+Enter** to run it, then explain what the output means.` },
+    lesson.algorithm || lesson.codingAssignment ? "" : lesson.starter
   ]);
   const bytes = new TextEncoder().encode(data);
   let binary = "";
@@ -1341,8 +1518,8 @@ function renderNav() {
     const isCurrent = inChapter.some(item => item.index === current);
     const chapterDone = inChapter.filter(item => completed.has(item.lesson.id)).length;
     const items = inChapter.map(({ lesson, index }, chapterLessonIndex) => `
-      <li><button class="lesson-tab ${index === current ? "active" : ""} ${completed.has(lesson.id) ? "done" : ""}" data-index="${index}" type="button" aria-current="${index === current ? "step" : "false"}">
-        <span class="lesson-number">${completed.has(lesson.id) ? "✓" : `${chapterIndex + 1}.${chapterLessonIndex + 1}`}</span><span class="tab-title">${lesson.title}</span>
+      <li><button class="lesson-tab ${index === current ? "active" : ""} ${completed.has(lesson.id) ? "done" : ""} ${lesson.codingAssignment ? "capstone" : ""}" data-index="${index}" type="button" aria-current="${index === current ? "step" : "false"}">
+        <span class="lesson-number">${completed.has(lesson.id) ? "✓" : `${chapterIndex + 1}.${chapterLessonIndex + 1}`}</span><span class="tab-title">${lesson.title}${lesson.codingAssignment ? `<small class="capstone-tag">CAPSTONE</small>` : ""}</span>
       </button></li>`).join("");
     return `<li class="chapter-group"><details ${isCurrent ? "open" : ""}><summary><span class="chapter-count">${String(chapterIndex + 1).padStart(2, "0")}</span><span class="chapter-nav-title">${chapter.title}</span><span class="chapter-nav-progress">${chapterDone}/${inChapter.length}</span></summary><ol>${items}</ol></details></li>`;
   }).join("");
@@ -1371,8 +1548,9 @@ function render() {
   const definitionBox = `<section class="learning-box definition-box" aria-label="New definitions"><h3><span class="learning-box-icon">D</span>New definitions</h3><dl>${support.definitions.map(([term, definition]) => `<div><dt>${escapeHtml(term)}</dt><dd>${escapeHtml(definition)}</dd></div>`).join("")}</dl></section>`;
   const toolBox = `<section class="learning-box tool-box" aria-label="New Sagebrush code tools"><h3><span class="learning-box-icon">{ }</span>New code tools · Sage mode</h3><dl>${support.tools.map(([name, description]) => `<div><dt><code>${escapeHtml(name)}</code></dt><dd>${escapeHtml(description)}</dd></div>`).join("")}</dl><p class="tool-note">Sage mode accepts Python-style assignment, loops, and lists. Sage's <code>^</code> means exponentiation; in regular Python use <code>**</code>.</p></section>`;
   const algorithmBox = lesson.algorithm ? `<section class="algorithm-box" aria-label="Algorithm pseudocode"><h3><span class="learning-box-icon">→</span>${escapeHtml(lesson.algorithm.title)}</h3><p>${escapeHtml(lesson.algorithm.prompt)}</p><pre><code>${escapeHtml(lesson.algorithm.pseudocode)}</code></pre><p class="algorithm-note">Use this plan to write the algorithm in the blank Sagebrush code cell below.</p></section>` : "";
+  const codingAssignmentBox = lesson.codingAssignment ? `<section class="coding-assignment-box" aria-label="Chapter coding assignment"><h3>CHAPTER CAPSTONE · BUILD IT YOURSELF</h3><p>Start with the blank Sagebrush cell below. Build a complete program that meets the assignment requirements, then check its output against the answer field. Optional hints are collapsed below.</p></section>` : "";
   const hintContent = lesson.hints ? `<ol>${lesson.hints.map(hint => `<li>${hint}</li>`).join("")}</ol>` : `<p>${lesson.hint}</p>`;
-  const hintBox = `<details class="work-hint"><summary>Need a nudge?</summary>${hintContent}</details>`;
+  const hintBox = `<details class="work-hint"><summary>${lesson.codingAssignment ? "Optional assignment hints" : "Need a nudge?"}</summary>${hintContent}</details>`;
   const proofPrompt = lesson.proof ? `<details class="proof-prompt"><summary>Try a short proof</summary><p>${escapeHtml(lesson.proof)}</p></details>` : "";
   const visual = support.visual ? `<figure class="math-visual"><figcaption><strong>${escapeHtml(support.visual.title)}</strong><span>${escapeHtml(support.visual.caption)}</span></figcaption>${support.visual.svg}<details><summary>Recreate the figure's data with Sage/Python</summary><pre><code>${escapeHtml(support.visual.source)}</code></pre></details></figure>` : "";
   const nextPaths = current === lessons.length - 1 ? `<section class="next-paths"><h3>Where to go next</h3><p>This course gives you a starting point in each area. These are natural continuations:</p><ul><li><b>Elementary number theory:</b> proofs and generalizations of quadratic reciprocity → modular square roots → Pell equations → continued fractions.</li><li><b>Computational number theory and cryptography:</b> Miller–Rabin primality testing → discrete logarithms → Diffie–Hellman and ElGamal → stronger factoring methods.</li><li><b>Algebraic number theory:</b> norms and rings of integers → ideals and ideal factorization → class groups and units → prime splitting in general number fields.</li><li><b>Elliptic curves:</b> curves over extension fields → faster point counting → isogenies → cryptographic implementation and security.</li></ul></section>` : "";
@@ -1387,10 +1565,11 @@ function render() {
     ${proofPrompt}
     <div class="learning-resources">${toolBox}${visual}</div>
     ${algorithmBox}
+    ${codingAssignmentBox}
     <section class="notebook-card" aria-labelledby="notebook-heading">
       <div class="notebook-heading"><div><p class="notebook-kicker">YOUR NUMBER THEORY LAB · SAGE MODE</p><h3 id="notebook-heading">Compute it here</h3></div><a class="notebook-popout" href="${notebookLink(lesson)}" target="_blank" rel="noopener noreferrer">Open in a separate tab <span aria-hidden="true">↗</span></a></div>
       <div class="notebook-host" id="sagebrush-notebook" aria-label="Sagebrush Sage notebook"><p class="notebook-loading" role="status">Starting Sagebrush…</p></div>
-      <p class="notebook-caption">This editable Sagebrush notebook runs in your browser. ${lesson.algorithm ? "Write your implementation and press" : "Change the starter code and press"} <kbd>Shift</kbd> + <kbd>Enter</kbd> to run it.</p>
+      <p class="notebook-caption">This editable Sagebrush notebook runs in your browser. ${lesson.algorithm || lesson.codingAssignment ? "Write your implementation and press" : "Change the starter code and press"} <kbd>Shift</kbd> + <kbd>Enter</kbd> to run it.</p>
     </section>
     ${hintBox}
     <div class="answer-block"><p class="answer-title">BRING YOUR RESULT BACK HERE</p><form class="answer-form" id="answer-form"><input class="answer-input" id="answer-input" autocomplete="off" spellcheck="false" aria-label="Your answer" placeholder="${lesson.placeholder}" ${solved ? "disabled" : ""}><button class="check-button" type="submit" ${solved ? "disabled" : ""}>${solved ? "Solved ✓" : "Check answer"}</button></form><p class="answer-feedback ${solved ? "good" : ""}" id="answer-feedback" aria-live="polite">${solved ? lesson.success : "Use the Sagebrush notebook to work it out, then enter your result."}</p><p class="answer-shortcut ${solved && lesson.sageCommand ? "show" : ""}" id="answer-shortcut">${solved && lesson.sageCommand ? `Sage's built-in command: <code>${escapeHtml(lesson.sageCommand)}</code>` : ""}</p></div>
