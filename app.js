@@ -17,7 +17,7 @@ const chapters = [
   {
     id: "finite-fields", title: "Finite fields & groups", short: "Finite fields",
     overview: "Arithmetic modulo a prime forms a finite field. Its nonzero elements make a unit group, linking inverses, cycles, and generators.",
-    goals: "Compute in a finite field, understand its unit group, identify quadratic residues, measure multiplicative order, and find generators."
+    goals: "Compute in a finite field, understand its unit group, identify quadratic residues, apply quadratic reciprocity, measure multiplicative order, and find generators."
   },
   {
     id: "rsa", title: "RSA & public-key arithmetic", short: "RSA",
@@ -258,6 +258,19 @@ const lessons = [
     answer: ["-1", "−1", "nonsquare", "non-square"], placeholder: "Legendre symbol = ?",
     success: "Correct: the symbol is −1, so 5 is not a square modulo 23.",
     concept: "The Legendre symbol compresses a yes/no question about squares into a useful multiplicative function."
+  },
+  {
+    id: "quadratic-reciprocity", chapter: 3, title: "Use quadratic reciprocity", topic: "QUADRATIC RECIPROCITY", time: "7 MIN",
+    lede: "Quadratic reciprocity links the question “is p a square modulo q?” to the reversed question “is q a square modulo p?”",
+    algorithm: { title: "Plan in pseudocode · predict and check", prompt: "Use the primes' remainders modulo 4 to predict the product of the two Legendre symbols, then check it with Sage.", pseudocode: "predict +1\nif p mod 4 = 3 and q mod 4 = 3:\n    predict −1\ncompute (p/q) and (q/p)\ncheck their product equals predict" },
+    question: "For <span class=\"math\">p = 7</span> and <span class=\"math\">q = 11</span>, compute <span class=\"math\">(p/q)(q/p)</span> using quadratic reciprocity, then verify it in Sagebrush.",
+    idea: "The theorem says the symbols have opposite signs exactly when both primes leave remainder 3 upon division by 4. Here 7 and 11 both do, so the product is −1.",
+    starter: "# Predict and verify quadratic reciprocity for distinct odd primes\np, q = 7, 11\npredicted_product = 1\n\n# TODO: change the prediction when both primes are 3 modulo 4\nif TODO:\n    predicted_product = TODO\n\n# TODO: compute each Legendre symbol and their product\nleft_symbol = TODO\nright_symbol = TODO\nactual_product = TODO\n\nprint(predicted_product, actual_product)",
+    hints: ["The condition is <code>p % 4 == 3 and q % 4 == 3</code>.", "When that condition is true, set <code>predicted_product = -1</code>.", "Compute <code>left_symbol = legendre_symbol(p, q)</code> and <code>right_symbol = legendre_symbol(q, p)</code>.", "Multiply them with <code>actual_product = left_symbol * right_symbol</code>; both products should be −1."],
+    answer: ["-1", "−1"], placeholder: "product = ?",
+    success: "Correct: both symbols have opposite signs, and their product is −1.",
+    proof: "Explain why the theorem predicts equal signs if at least one of p or q is 1 modulo 4, and opposite signs if both are 3 modulo 4.",
+    concept: "Quadratic reciprocity turns many square tests modulo primes into a relationship between two primes."
   },
   {
     id: "multiplicative-order", chapter: 3, title: "Measure a multiplicative cycle", topic: "GROUPS MODULO p", time: "6 MIN",
@@ -676,6 +689,20 @@ const lessonSupport = {
       ["legendre_symbol(a, p)", "Returns 1, 0, or -1 with the meanings defined above. Inputs should use an odd prime p."],
       ["power_mod(a, e, p)", "Computes a^e modulo p; set e=(p-1)//2 to check Euler's criterion. // is integer division in Sage/Python."],
       ["GF(p)", "Creates the finite field modulo prime p; you can list x^2 for x in GF(p) to see the square residues directly."]
+    ]
+  },
+  "quadratic-reciprocity": {
+    definitions: [
+      ["Quadratic reciprocity", "For distinct odd primes p and q, (p/q)(q/p) = (−1)^(((p−1)/2)((q−1)/2)). It says the two Legendre symbols have opposite signs exactly when p and q are both 3 modulo 4."],
+      ["Distinct odd primes", "Two different prime numbers greater than 2. The theorem's inputs p=7 and q=11 meet this condition."],
+      ["Congruent modulo 4", "Two integers are congruent modulo 4 when they leave the same remainder after division by 4. An odd prime is congruent to either 1 or 3 modulo 4."],
+      ["Legendre symbol (a/p)", "For odd prime p, it is 0 if p divides a, +1 if a is a nonzero square modulo p, and −1 otherwise. Quadratic reciprocity compares (p/q) and (q/p)."]
+    ],
+    tools: [
+      ["legendre_symbol(a, p)", "Returns 1, 0, or −1 for whether a is a nonzero square modulo the odd prime p, is divisible by p, or is a nonsquare."],
+      ["a % 4", "Returns the remainder after dividing a by 4; the theorem uses this to distinguish odd primes congruent to 1 or 3 modulo 4."],
+      ["if condition:", "Runs the indented code only when condition is True. Combine tests with and, as in p % 4 == 3 and q % 4 == 3."],
+      ["== and *", "The double equals operator tests whether two values are equal; * multiplies values. The starter uses both to check the theorem's prediction."]
     ]
   },
   "multiplicative-order": {
@@ -1248,18 +1275,18 @@ function render() {
   const hintBox = `<details class="work-hint"><summary>Need a nudge?</summary>${hintContent}</details>`;
   const proofPrompt = lesson.proof ? `<details class="proof-prompt"><summary>Try a short proof</summary><p>${escapeHtml(lesson.proof)}</p></details>` : "";
   const visual = support.visual ? `<figure class="math-visual"><figcaption><strong>${escapeHtml(support.visual.title)}</strong><span>${escapeHtml(support.visual.caption)}</span></figcaption>${support.visual.svg}<details><summary>Recreate the figure's data with Sage/Python</summary><pre><code>${escapeHtml(support.visual.source)}</code></pre></details></figure>` : "";
-  const nextPaths = current === lessons.length - 1 ? `<section class="next-paths"><h3>Where to go next</h3><p>This course gives you a starting point in each area. These are natural continuations:</p><ul><li><b>Elementary number theory:</b> quadratic reciprocity → modular square roots → Pell equations → continued fractions.</li><li><b>Computational number theory and cryptography:</b> Miller–Rabin primality testing → discrete logarithms → Diffie–Hellman and ElGamal → stronger factoring methods.</li><li><b>Algebraic number theory:</b> norms and rings of integers → ideals and ideal factorization → class groups and units → prime splitting in general number fields.</li><li><b>Elliptic curves:</b> curves over extension fields → faster point counting → isogenies → cryptographic implementation and security.</li></ul></section>` : "";
+  const nextPaths = current === lessons.length - 1 ? `<section class="next-paths"><h3>Where to go next</h3><p>This course gives you a starting point in each area. These are natural continuations:</p><ul><li><b>Elementary number theory:</b> proofs and generalizations of quadratic reciprocity → modular square roots → Pell equations → continued fractions.</li><li><b>Computational number theory and cryptography:</b> Miller–Rabin primality testing → discrete logarithms → Diffie–Hellman and ElGamal → stronger factoring methods.</li><li><b>Algebraic number theory:</b> norms and rings of integers → ideals and ideal factorization → class groups and units → prime splitting in general number fields.</li><li><b>Elliptic curves:</b> curves over extension fields → faster point counting → isogenies → cryptographic implementation and security.</li></ul></section>` : "";
   panel.innerHTML = `
     <div class="module-meta"><span class="module-tag">${lesson.topic}</span><span>CH ${String(lesson.chapter + 1).padStart(2, "0")} · LESSON ${chapterLesson} / ${chapterLessons}</span><span>·</span><span>${lesson.time}</span></div>
     <div class="module-heading"><h2>${lesson.title}</h2><span class="solved-stamp ${solved ? "show" : ""}">✓ SOLVED</span></div>
     ${chapterIntro}
     ${definitionBox}
     <p class="module-lede">${lesson.lede}</p>
-    ${algorithmBox}
     <div class="question-card"><span class="question-symbol">?</span><div><p class="question-label">YOUR PROBLEM</p><p>${lesson.question}</p></div></div>
     <p class="idea-row"><span class="bulb">✳</span><span><b>The idea.</b> ${lesson.idea}</span></p>
     ${proofPrompt}
     <div class="learning-resources">${toolBox}${visual}</div>
+    ${algorithmBox}
     <section class="notebook-card" aria-labelledby="notebook-heading">
       <div class="notebook-heading"><div><p class="notebook-kicker">YOUR NUMBER THEORY LAB · SAGE MODE</p><h3 id="notebook-heading">Compute it here</h3></div><a class="notebook-popout" href="${notebookLink(lesson)}" target="_blank" rel="noopener noreferrer">Open in a separate tab <span aria-hidden="true">↗</span></a></div>
       <div class="notebook-host" id="sagebrush-notebook" aria-label="Sagebrush Sage notebook"><p class="notebook-loading" role="status">Starting Sagebrush…</p></div>
@@ -1306,5 +1333,26 @@ function navigate(index) {
 $("#reset-progress").addEventListener("click", () => {
   if (!completed.size) return;
   completed.clear(); localStorage.removeItem(storageKey); render();
+});
+
+const courseSearch = $("#course-search");
+const courseSearchResults = $("#course-search-results");
+courseSearch.addEventListener("input", () => {
+  const query = courseSearch.value.trim().toLocaleLowerCase();
+  if (!query) {
+    courseSearchResults.innerHTML = "";
+    return;
+  }
+  const matches = lessons.map((lesson, index) => ({ lesson, index }))
+    .filter(({ lesson }) => JSON.stringify({ lesson, support: lessonSupport[lesson.id] }).toLocaleLowerCase().includes(query))
+    .slice(0, 8);
+  courseSearchResults.innerHTML = matches.length
+    ? matches.map(({ lesson, index }) => `<button class="course-search-result" type="button" data-index="${index}"><strong>${escapeHtml(lesson.title)}</strong><span>${escapeHtml(lesson.topic)}</span></button>`).join("")
+    : `<p class="course-search-empty">No matching lesson. Try a theorem, definition, or Sage function.</p>`;
+  courseSearchResults.querySelectorAll("button").forEach(button => button.addEventListener("click", () => {
+    navigate(Number(button.dataset.index));
+    courseSearch.value = "";
+    courseSearchResults.innerHTML = "";
+  }));
 });
 render();
