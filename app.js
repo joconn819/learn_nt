@@ -464,6 +464,27 @@ const lessons = [
 
 // Each lesson after the introductory gcd lesson names its new mathematics
 // explicitly and documents the Sage/Python tools used in its notebook.
+const sageShortcuts = {
+  gcd: "gcd(a, b)",
+  bezout: "xgcd(a, b)",
+  "factor-small": "factor(n)",
+  totient: "euler_phi(n)",
+  remainders: "power_mod(a, exponent, modulus)",
+  inverse: "inverse_mod(a, n)",
+  crt: "crt(a, b, m, n)",
+  primality: "is_prime(n)",
+  "prime-search": "next_prime(bound)",
+  "prime-count": "len(prime_range(bound))",
+  "unit-group": "F.list()[1:]",
+  "quadratic-residues": "legendre_symbol(a, p)",
+  "quadratic-reciprocity": "legendre_symbol(p, q) * legendre_symbol(q, p)",
+  "multiplicative-order": "Mod(a, n).multiplicative_order()",
+  "primitive-root": "primitive_root(p)",
+  "elliptic-curve": "E.cardinality()",
+  "elliptic-order": "P.order()",
+  "elliptic-dh": "alice_secret * bob_public\nbob_secret * alice_public"
+};
+
 const lessonSupport = {
   gcd: {
     definitions: [
@@ -956,6 +977,7 @@ const lessonSupport = {
 let pseudocodeDefined = false;
 for (const lesson of lessons) {
   if (!lesson.algorithm) continue;
+  lesson.sageCommand = sageShortcuts[lesson.id];
   if (!pseudocodeDefined) {
     lessonSupport[lesson.id].definitions.unshift([
       "Pseudocode",
@@ -963,14 +985,9 @@ for (const lesson of lessons) {
     ]);
     pseudocodeDefined = true;
   }
-  lessonSupport[lesson.id].tools.unshift([
-    "TODO",
-    "A visible placeholder in the starter code. It is not a Sage command: replace it with the condition or expression asked for in the comment before running the cell."
-  ]);
 }
 lessonSupport.gcd.tools.push(
   ["while condition:", "Repeats the indented body as long as condition is True. The loop ends when b becomes 0."],
-  ["pass", "A no-operation placeholder. Replace it with the statements that make the loop work."],
   ["r = a % b", "Computes the remainder and saves it in r before a and b are updated."],
   ["a = b", "Assignment changes the value stored in a. The right side is evaluated first."]
 );
@@ -991,36 +1008,31 @@ lessonSupport.totient.tools.push(
   ["gcd(k,n)", "Calls the gcd function taught earlier to test whether k and n share any factor greater than 1."],
   ["gcd(k,n) == 1", "Returns True exactly when k is coprime to n, so that integer should be counted."],
   ["range(1, n+1)", "Creates the integers 1 through n. The stop value n+1 is excluded by range, so n is included."],
-  ["for k in TODO:", "Runs the indented block once for each value produced by the sequence after in."],
-  ["count += 1", "Adds one to the current count, the same as count = count + 1."],
-  ["pass", "A no-operation placeholder. Replace it with the conditional counting code."]
+  ["for k in range(1, n+1):", "Runs the indented block once for each integer k from 1 through n."],
+  ["count += 1", "Adds one to the current count, the same as count = count + 1."]
 );
 lessonSupport.remainders.tools.push(
   ["def mod_exp(a, exponent, modulus):", "Defines a reusable function with three inputs: base, exponent, and modulus. The indented lines are its body."],
   ["%", "Remainder operator. Reducing after multiplication keeps each intermediate value smaller than the modulus."],
   ["//", "Integer division. Dividing the exponent by 2 this way discards any fractional part."],
   ["return result", "Ends the function and sends result back to the line that called the function."],
-  ["exponent % 2 == 1", "Tests whether exponent is odd. The remainder after division by 2 is 1 exactly for odd integers."],
-  ["pass", "A no-operation placeholder. Replace each one with a step from the pseudocode."]
+  ["exponent % 2 == 1", "Tests whether exponent is odd. The remainder after division by 2 is 1 exactly for odd integers."]
 );
 lessonSupport.inverse.tools.push(
   ["range(1, n)", "Produces the candidate residues 1 through n−1; n itself represents zero modulo n."],
   ["break", "Immediately exits the nearest loop after an inverse is found."],
   ["u = None", "Initializes u to a special value meaning ‘no candidate found yet.’"],
-  ["if condition:", "Runs the indented block only when the condition is True."],
-  ["pass", "A no-operation placeholder to replace with the inverse check and assignment."]
+  ["if condition:", "Runs the indented block only when the condition is True."]
 );
 lessonSupport.crt.tools.push(
   ["range(period)", "Produces every integer from 0 to period−1, one representative of each residue modulo period."],
   ["and", "Combines two conditions; both must be True for the combined condition to be True."],
   ["solution = x", "Saves the first candidate satisfying both congruences."],
-  ["break", "Stops the search after the first matching x is found."],
-  ["pass", "A no-operation placeholder to replace with the two remainder tests."]
+  ["break", "Stops the search after the first matching x is found."]
 );
-  lessonSupport.primality.tools.push(
+lessonSupport.primality.tools.push(
   ["while d*d <= n:", "Continues trial division only while the candidate divisor is at most the square root of n, written without a square-root operation."],
-  ["break", "Exits a loop immediately when a divisor is found."],
-  ["pass", "A no-operation placeholder. Replace it with the divisor test or increment."]
+  ["break", "Exits a loop immediately when a divisor is found."]
 );
 lessonSupport["prime-search"].tools.push(
   ["while condition:", "Repeats the loop body while condition is True."],
@@ -1043,8 +1055,7 @@ lessonSupport["multiplicative-order"].tools.push(
   ["order += 1", "Increases the exponent counter by one after each multiplication."],
   ["while value != 1 or order == 0:", "The or condition ensures at least one power is computed, even though the initial value is already 1."],
   ["value != 1", "The loop continues while the current power is different from the multiplicative identity 1."],
-  ["or", "The condition on its left or its right may be True; if either is True, the combined condition is True."],
-  ["pass", "A no-operation placeholder to replace with the multiplication and counter updates."]
+  ["or", "The condition on its left or its right may be True; if either is True, the combined condition is True."]
 );
 lessonSupport["primitive-root"].tools.push(
   ["set()", "Creates an empty set, a collection that stores each value only once."],
@@ -1053,8 +1064,10 @@ lessonSupport["primitive-root"].tools.push(
   ["len(powers) == p-1", "Tests whether the candidate produced all p−1 nonzero residues without repetition."],
   ["break", "Stops after the first generator is found; candidates are tested in increasing order."]
 );
+lessonSupport["prime-count"].tools.push(
+  ["len(prime_range(bound))", "Counts the primes returned by prime_range(bound), which lists primes greater than or equal to 2 and less than bound."]
+);
 lessonSupport["unit-group"].tools = [
-  ["TODO", "A visible placeholder in the starter code. It is not a Sage command; replace it with the condition or expression described in the comment."],
   ["GF(13)", "Creates the finite field with 13 elements and assigns it to F. Its elements can be represented by residues 0 through 12."],
   ["for a in F:", "Loops through each element of the finite field F, assigning the current element to a."],
   ["if a != 0:", "Runs its indented body only for nonzero a. Every nonzero field element has a multiplicative inverse."],
@@ -1062,12 +1075,14 @@ lessonSupport["unit-group"].tools = [
   ["print(units)", "Displays the list of nonzero elements so you can inspect the set you constructed."],
   ["len(units)", "Returns the number of entries in the list. Here it counts the 12 elements of F₁₃ˣ."]
 ];
+lessonSupport["unit-group"].tools.push(
+  ["F.list()[1:]", "Returns the finite field's elements as a list, then skips the first element 0. The remaining entries are exactly the nonzero elements, which form the unit group."]
+);
 lessonSupport["quadratic-residues"].tools.push(
   ["range(p)", "Produces the integers 0 through p−1, all possible residue representatives to test as square roots."],
   ["(x*x) % p == a", "Squares x, reduces the result modulo p, and tests whether it equals a."],
   ["found = True", "Stores the Boolean result that a square root has been found."],
-  ["break", "Stops checking further x values after finding a square root."],
-  ["pass", "A no-operation placeholder to replace with the square-root test."]
+  ["break", "Stops checking further x values after finding a square root."]
 );
 lessonSupport["elliptic-curve"].tools.push(
   ["for x in F:", "Loops over all 17 field elements as possible x-coordinates."],
@@ -1126,9 +1141,6 @@ lessonSupport.primality.definitions.push(
 lessonSupport.gcd.definitions.push(
   ["Loop", "A block of code that repeats. A while loop repeats as long as its condition is True."]
 );
-for (const id of ["factor-small", "totient", "unit-group", "quadratic-residues", "elliptic-curve"]) {
-  lessonSupport[id].tools.push(["pass", "A no-operation placeholder. Replace it with the code described in the surrounding TODO comment."]);
-}
 lessonSupport.totient.tools.push(["if condition:", "Runs the indented block only when the condition evaluates to True."]);
 lessonSupport["factor-small"].tools.push(
   ["if condition:", "Runs the indented block only when the condition is True."],
@@ -1197,19 +1209,19 @@ async function mountNotebook(lesson, host, generation) {
     });
     mountedKernel = kernel;
     mountedNotebook = notebook;
+    const starterCode = lesson.algorithm ? "" : lesson.starter;
     const cells = [
       {
         id: cellId(),
         type: "markdown",
-        code: `# ${lesson.title}\n\n${lesson.lede}\n\n**Problem:** ${lesson.question.replace(/<[^>]*>/g, "")}\n\nEdit the starter cell below and press **Shift+Enter** to run it.`
+        code: `# ${lesson.title}\n\n${lesson.lede}\n\n**Problem:** ${lesson.question.replace(/<[^>]*>/g, "")}\n\n${lesson.algorithm ? "Use the plan above to write your algorithm in the empty code cell below." : "Edit the starter cell below."} Press **Shift+Enter** to run it.`
       },
-      { id: cellId(), code: lesson.starter }
+      { id: cellId(), code: starterCode }
     ];
     kernel.start();
-    // The pseudocode exercises use a fresh notebook record so an older saved
-    // full-solution starter does not hide the new learner-written scaffold.
-    // Earlier records remain in IndexedDB and are not deleted.
-    const notebookId = `fieldnotes-${lesson.id}${lesson.algorithm ? "-guided" : ""}`;
+    // Algorithm lessons use a fresh notebook record with a blank code cell;
+    // earlier saved starters remain in IndexedDB and are not deleted.
+    const notebookId = `fieldnotes-${lesson.id}${lesson.algorithm ? "-learner" : ""}`;
     await notebook.attach(new IdbStore(db, notebookId, { name: lesson.title, mode: "sage", cells }));
     if (generation !== notebookGeneration) {
       notebook.destroy();
@@ -1228,8 +1240,8 @@ async function mountNotebook(lesson, host, generation) {
 
 function notebookLink(lesson) {
   const data = JSON.stringify([
-    { md: `# ${lesson.title}\n\n${lesson.lede}\n\n**Problem:** ${lesson.question.replace(/<[^>]*>/g, "")}\n\nWork it out in Sage mode. Change the code cell, run it with **Shift+Enter**, and explain what the output means.` },
-    lesson.starter
+    { md: `# ${lesson.title}\n\n${lesson.lede}\n\n**Problem:** ${lesson.question.replace(/<[^>]*>/g, "")}\n\n${lesson.algorithm ? "Use the pseudocode plan to write and run your own implementation." : "Work it out in Sage mode by editing the code cell."} Press **Shift+Enter** to run it, then explain what the output means.` },
+    lesson.algorithm ? "" : lesson.starter
   ]);
   const bytes = new TextEncoder().encode(data);
   let binary = "";
@@ -1274,7 +1286,7 @@ function render() {
   const chapterIntro = firstInChapter ? `<div class="chapter-intro"><b>CHAPTER ${String(lesson.chapter + 1).padStart(2, "0")} · ${chapter.title}</b><p>${chapter.overview}</p><span>${chapter.goals}</span></div>` : "";
   const definitionBox = `<section class="learning-box definition-box" aria-label="New definitions"><h3><span class="learning-box-icon">D</span>New definitions</h3><dl>${support.definitions.map(([term, definition]) => `<div><dt>${escapeHtml(term)}</dt><dd>${escapeHtml(definition)}</dd></div>`).join("")}</dl></section>`;
   const toolBox = `<section class="learning-box tool-box" aria-label="New Sagebrush code tools"><h3><span class="learning-box-icon">{ }</span>New code tools · Sage mode</h3><dl>${support.tools.map(([name, description]) => `<div><dt><code>${escapeHtml(name)}</code></dt><dd>${escapeHtml(description)}</dd></div>`).join("")}</dl><p class="tool-note">Sage mode accepts Python-style assignment, loops, and lists. Sage's <code>^</code> means exponentiation; in regular Python use <code>**</code>.</p></section>`;
-  const algorithmBox = lesson.algorithm ? `<section class="algorithm-box" aria-label="Algorithm pseudocode"><h3><span class="learning-box-icon">→</span>${escapeHtml(lesson.algorithm.title)}</h3><p>${escapeHtml(lesson.algorithm.prompt)}</p><pre><code>${escapeHtml(lesson.algorithm.pseudocode)}</code></pre><p class="algorithm-note">The starter code marks unfinished lines with <code>TODO</code>. Replace those markers before running it.</p></section>` : "";
+  const algorithmBox = lesson.algorithm ? `<section class="algorithm-box" aria-label="Algorithm pseudocode"><h3><span class="learning-box-icon">→</span>${escapeHtml(lesson.algorithm.title)}</h3><p>${escapeHtml(lesson.algorithm.prompt)}</p><pre><code>${escapeHtml(lesson.algorithm.pseudocode)}</code></pre><p class="algorithm-note">Use this plan to write the algorithm in the blank Sagebrush code cell below.</p></section>` : "";
   const hintContent = lesson.hints ? `<ol>${lesson.hints.map(hint => `<li>${hint}</li>`).join("")}</ol>` : `<p>${lesson.hint}</p>`;
   const hintBox = `<details class="work-hint"><summary>Need a nudge?</summary>${hintContent}</details>`;
   const proofPrompt = lesson.proof ? `<details class="proof-prompt"><summary>Try a short proof</summary><p>${escapeHtml(lesson.proof)}</p></details>` : "";
@@ -1294,10 +1306,10 @@ function render() {
     <section class="notebook-card" aria-labelledby="notebook-heading">
       <div class="notebook-heading"><div><p class="notebook-kicker">YOUR NUMBER THEORY LAB · SAGE MODE</p><h3 id="notebook-heading">Compute it here</h3></div><a class="notebook-popout" href="${notebookLink(lesson)}" target="_blank" rel="noopener noreferrer">Open in a separate tab <span aria-hidden="true">↗</span></a></div>
       <div class="notebook-host" id="sagebrush-notebook" aria-label="Sagebrush Sage notebook"><p class="notebook-loading" role="status">Starting Sagebrush…</p></div>
-      <p class="notebook-caption">This editable Sagebrush notebook runs in your browser. Change the starter code and press <kbd>Shift</kbd> + <kbd>Enter</kbd> to run it.</p>
+      <p class="notebook-caption">This editable Sagebrush notebook runs in your browser. ${lesson.algorithm ? "Write your implementation and press" : "Change the starter code and press"} <kbd>Shift</kbd> + <kbd>Enter</kbd> to run it.</p>
     </section>
     ${hintBox}
-    <div class="answer-block"><p class="answer-title">BRING YOUR RESULT BACK HERE</p><form class="answer-form" id="answer-form"><input class="answer-input" id="answer-input" autocomplete="off" spellcheck="false" aria-label="Your answer" placeholder="${lesson.placeholder}" ${solved ? "disabled" : ""}><button class="check-button" type="submit" ${solved ? "disabled" : ""}>${solved ? "Solved ✓" : "Check answer"}</button></form><p class="answer-feedback ${solved ? "good" : ""}" id="answer-feedback" aria-live="polite">${solved ? lesson.success : "Use the Sagebrush notebook to work it out, then enter your result."}</p></div>
+    <div class="answer-block"><p class="answer-title">BRING YOUR RESULT BACK HERE</p><form class="answer-form" id="answer-form"><input class="answer-input" id="answer-input" autocomplete="off" spellcheck="false" aria-label="Your answer" placeholder="${lesson.placeholder}" ${solved ? "disabled" : ""}><button class="check-button" type="submit" ${solved ? "disabled" : ""}>${solved ? "Solved ✓" : "Check answer"}</button></form><p class="answer-feedback ${solved ? "good" : ""}" id="answer-feedback" aria-live="polite">${solved ? lesson.success : "Use the Sagebrush notebook to work it out, then enter your result."}</p><p class="answer-shortcut ${solved && lesson.sageCommand ? "show" : ""}" id="answer-shortcut">${solved && lesson.sageCommand ? `Sage's built-in command: <code>${escapeHtml(lesson.sageCommand)}</code>` : ""}</p></div>
     ${nextPaths}
     <div class="lesson-bottom"><span class="lesson-bottom-note">${lesson.concept}</span>${current > 0 ? `<button class="prev-button" id="prev-button" type="button">← Previous</button>` : ""}<button class="next-button ${solved && current < lessons.length - 1 ? "show" : ""}" id="next-button" type="button">${current === lessons.length - 1 ? "Curriculum complete" : "Next lesson"}<span>→</span></button></div>`;
   mountNotebook(lesson, $("#sagebrush-notebook", panel), notebookGeneration);
@@ -1316,6 +1328,10 @@ function render() {
       $(".check-button", panel).textContent = "Solved ✓";
       $("#answer-feedback", panel).textContent = lesson.success;
       $("#answer-feedback", panel).className = "answer-feedback good";
+      if (lesson.sageCommand) {
+        $("#answer-shortcut", panel).innerHTML = `Sage's built-in command: <code>${escapeHtml(lesson.sageCommand)}</code>`;
+        $("#answer-shortcut", panel).classList.add("show");
+      }
       if (current < lessons.length - 1) $("#next-button", panel).classList.add("show");
     } else {
       feedback.textContent = entry ? "Not quite. Inspect your Sagebrush output and try again." : "Run the Sagebrush computation, then enter your result.";
