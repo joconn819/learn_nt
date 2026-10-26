@@ -1,6 +1,6 @@
 # Number Theory Fieldnotes
 
-A static, GitHub Pages course for computational number theory and Sagebrush. It has seven chapters and 35 lessons, introducing prime numbers before factorization, then coprimality and modular arithmetic before Euler's totient, followed by finite fields and their unit groups, quadratic residues and quadratic reciprocity, RSA, quadratic fields and class groups, and elliptic curves. Algorithm lessons put plain-language pseudocode immediately before an initially blank Sage code cell, with staged hints to help learners write their own implementation. After a correct answer, the lesson reveals Sage's built-in command for the same computation. Selected lessons also include short proof prompts. Every lesson embeds its own editable Sage-mode Sagebrush notebook in the page, so learners can compute and check their result without leaving the course. A course search finds lesson content, definitions, and Sage code tools. Lesson notebooks and course progress are saved in this browser.
+A static, GitHub Pages course for computational number theory and Sagebrush. It has 15 chapters and 62 lessons, moving from integer arithmetic, congruences, and primes through finite fields, RSA, algebraic number theory, and elliptic curves. Eight follow-on chapters deepen quadratic reciprocity, continued fractions, cryptographic algorithms, coding theory, unit groups and ideals, p-adic methods, analytic number theory, and advanced elliptic curves. Chapter lesson counts vary with the material. Algorithm lessons put plain-language pseudocode immediately before an initially blank Sage code cell, with staged hints to help learners write their own implementation. After a correct answer, the lesson reveals Sage's built-in command for the same computation. Selected lessons also include short proof prompts. Every lesson embeds its own editable Sage-mode Sagebrush notebook in the page, so learners can compute and check their result without leaving the course. A course search finds lesson content, definitions, and Sage code tools. Lesson notebooks and course progress are saved in this browser.
 
 ## Curriculum
 
@@ -11,6 +11,14 @@ A static, GitHub Pages course for computational number theory and Sagebrush. It 
 5. RSA and public-key arithmetic: key parameters, modular inverses, encryption, and decryption.
 6. Quadratic fields and class groups: discriminants, ideal classes, unique factorization, and prime splitting.
 7. Elliptic curves: finite-field curves, point counting, point addition, point order, discrete logarithms, and toy Diffie–Hellman key agreement.
+8. Quadratic residues in depth: Gauss's lemma, supplementary laws, Jacobi symbols, and modular square roots.
+9. Continued fractions and Diophantine equations: expansions, convergents, and Pell equations.
+10. Algorithms behind cryptography: baby-step giant-step, Pollard's rho, and a toy RSA factoring attack.
+11. Coding theory over finite fields: Hamming distance and codes, plus Reed–Solomon evaluation.
+12. Units and deeper algebraic number theory: norms, real quadratic units, Dirichlet's unit theorem, and ideal class groups.
+13. p-adic numbers and lifting: valuations, Hensel's lemma, and roots modulo prime powers.
+14. Analytic number theory: the Möbius function, inversion, and prime-counting estimates.
+15. Advanced elliptic curves: the Hasse bound, isogenies, pairings, and rational points.
 
 ## Where to continue
 
