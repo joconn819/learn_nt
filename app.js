@@ -262,11 +262,10 @@ const lessons = [
   {
     id: "quadratic-reciprocity", chapter: 3, title: "Use quadratic reciprocity", topic: "QUADRATIC RECIPROCITY", time: "7 MIN",
     lede: "Quadratic reciprocity links the question “is p a square modulo q?” to the reversed question “is q a square modulo p?”",
-    algorithm: { title: "Plan in pseudocode · predict and check", prompt: "Use the primes' remainders modulo 4 to predict the product of the two Legendre symbols, then check it with Sage.", pseudocode: "predict +1\nif p mod 4 = 3 and q mod 4 = 3:\n    predict −1\ncompute (p/q) and (q/p)\ncheck their product equals predict" },
     question: "For <span class=\"math\">p = 7</span> and <span class=\"math\">q = 11</span>, compute <span class=\"math\">(p/q)(q/p)</span> using quadratic reciprocity, then verify it in Sagebrush.",
     idea: "The theorem says the symbols have opposite signs exactly when both primes leave remainder 3 upon division by 4. Here 7 and 11 both do, so the product is −1.",
-    starter: "# Predict and verify quadratic reciprocity for distinct odd primes\np, q = 7, 11\npredicted_product = 1\n\n# TODO: change the prediction when both primes are 3 modulo 4\nif TODO:\n    predicted_product = TODO\n\n# TODO: compute each Legendre symbol and their product\nleft_symbol = TODO\nright_symbol = TODO\nactual_product = TODO\n\nprint(predicted_product, actual_product)",
-    hints: ["The condition is <code>p % 4 == 3 and q % 4 == 3</code>.", "When that condition is true, set <code>predicted_product = -1</code>.", "Compute <code>left_symbol = legendre_symbol(p, q)</code> and <code>right_symbol = legendre_symbol(q, p)</code>.", "Multiply them with <code>actual_product = left_symbol * right_symbol</code>; both products should be −1."],
+    starter: "# Check quadratic reciprocity for distinct odd primes\np, q = 7, 11\nleft_symbol = legendre_symbol(p, q)\nright_symbol = legendre_symbol(q, p)\nproduct = left_symbol * right_symbol\nprint(left_symbol, right_symbol, product)",
+    hints: ["The first symbol is <code>legendre_symbol(p, q)</code>; the second reverses the inputs: <code>legendre_symbol(q, p)</code>.", "Multiply the two returned values to compute their product.", "Because both 7 and 11 are 3 modulo 4, the theorem predicts a product of −1.", "The Sagebrush output is <code>-1 1 -1</code>. The order of the first two values is (7/11), then (11/7)."],
     answer: ["-1", "−1"], placeholder: "product = ?",
     success: "Correct: both symbols have opposite signs, and their product is −1.",
     proof: "Explain why the theorem predicts equal signs if at least one of p or q is 1 modulo 4, and opposite signs if both are 3 modulo 4.",
